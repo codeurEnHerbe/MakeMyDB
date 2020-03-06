@@ -9,20 +9,10 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 })
 export class CanvasComponent implements OnInit {
 
-  @Input() list: {id: string, label: string};
+  @Input() list: Array<Drag> = [];
 
-  nodes: Array<Drag> = [
-    {
-      id: 'first',
-      label: 'A'
-    }, {
-      id: 'second',
-      label: 'B'
-    }, {
-      id: 'third',
-      label: 'C'
-    }
-  ];
+  
+
 
   constructor() { }
 

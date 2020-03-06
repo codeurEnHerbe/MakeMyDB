@@ -1,6 +1,6 @@
 <ngx-graph
 class="chart-container"
-[view]="[500, 200]"
+[view]="[1000, 800]"
 [links]="[
     {
       id: 'a',
@@ -12,14 +12,20 @@ class="chart-container"
       source: 'first',
       target: 'third',
       label: 'custom label'
+    }, {
+      id: 'c',
+      source: 'first',
+      target: 'TEST',
+      label: 'custom label'
     }
   ]"
-  [nodes]="nodes"
+  [nodes]="list"
 >
-  <ng-template #nodeTemplate let-node>
-    <svg:g class="node">
+  <ng-template #nodeTemplate let-node class="node">
+    <svg:g >
       <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height" [attr.fill]="node.data.color" />
-      <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
+      <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="0">{{node.label}}</svg:text>
+      <svg:text *ngFor="let att of node.attributes" [attr.x]="10" [attr.y]="20 * att.id" >{{att.name}}</svg:text>
     </svg:g>
   </ng-template>
 </ngx-graph>

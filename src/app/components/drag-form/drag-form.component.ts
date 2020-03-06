@@ -9,7 +9,7 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 export class DragFormComponent implements OnInit {
 
   private dragName: string;
-  @Output() list: EventEmitter<Drag> = new EventEmitter<Drag>();
+  @Output() list: EventEmitter<string> = new EventEmitter<string>();
 
   constructor() { }
 
@@ -17,7 +17,7 @@ export class DragFormComponent implements OnInit {
   }
 
   public createDrag(){
-    this.list.emit({id: this.dragName, label: this.dragName});
+    this.list.emit(this.dragName);
   }
 
 }
