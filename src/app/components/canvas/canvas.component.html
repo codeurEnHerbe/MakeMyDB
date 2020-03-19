@@ -1,6 +1,6 @@
 <ngx-graph
   class="chart-container"
-  [view]="[500, 200]"
+  [view]="[800, 300]"
   [links]="link"
   [nodes]="list"
 >
@@ -11,3 +11,9 @@
     </svg:g>
   </ng-template>
 </ngx-graph>
+
+<button (click)="loadAllSchemasByName()">Load Shema</button>
+
+<div *ngFor="let schema of loadedAllSchemasByName">
+  <label>{{schema.id}} : {{schema.name}}</label>
+</div>

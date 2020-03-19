@@ -8,8 +8,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragFormComponent } from './components/drag-form/drag-form.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { HttpClientModule } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
+import { SchemaRestService } from './services/schema-rest.service';
 
 
 @NgModule({
@@ -24,9 +26,10 @@ import { FormsModule } from '@angular/forms';
     AppRoutingModule,
     BrowserAnimationsModule,
     NgxGraphModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [SchemaRestService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

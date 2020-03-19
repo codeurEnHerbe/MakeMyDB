@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, SimpleChanges } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
+import { SchemaRestService, SchemaDTO } from 'src/app/services/schema-rest.service';
 // import { ngx-graph } from '@swimlane/ngx-graph';
 
 @Component({
@@ -39,8 +40,11 @@ export class CanvasComponent implements OnInit {
     }
   ];
 
-  constructor() { 
+  loadedAllSchemasByName: Array<SchemaDTO> = [];
+
+  constructor(private schemaRestService:SchemaRestService) { 
   }
+
   print(e){
     console.log(e)
   }
@@ -67,6 +71,13 @@ export class CanvasComponent implements OnInit {
   }
   private addNewEntity(newEntity: Drag) {
     this.list = [...this.list, newEntity];
+  }
+
+  loadAllSchemasByName(){
+    this.schemaRestService.findAllSchemasByName("test").subscribe((values)=>{
+      this.loadedAllSchemasByName = values;
+    });
+
   }
 
 }
