@@ -76,8 +76,9 @@ export class CanvasComponent implements OnInit {
   loadAllSchemasByName(){
     this.schemaRestService.findAllSchemasByName("test").subscribe((values)=>{
       this.loadedAllSchemasByName = values;
+    }, (error)=>{
+      console.error(error)
     });
-
   }
 
 }
