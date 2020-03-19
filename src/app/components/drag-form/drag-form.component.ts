@@ -17,7 +17,7 @@ export class DragFormComponent implements OnInit {
   }
 
   public createDrag() {
-    this.list.emit({ id: this.dragName, label: this.dragName });
+    this.list.emit({ id: "id-"+this.dragName, label: this.dragName });
   }
 
 }

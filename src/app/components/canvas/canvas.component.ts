@@ -10,6 +10,8 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 export class CanvasComponent implements OnInit {
   @Input() newEntity;
 
+  sourceSelectedNode: string = null;
+
   list: Array<Drag> = [
     {
       id: 'first',
@@ -23,10 +25,37 @@ export class CanvasComponent implements OnInit {
     }
   ];
 
+  link = [
+    {
+      id: 'a',
+      source: 'first',
+      target: 'second',
+      label: 'is parent of'
+    }, {
+      id: 'b',
+      source: 'first',
+      target: 'third',
+      label: 'custom label'
+    }
+  ];
+
   constructor() { 
+  }
+  print(e){
+    console.log(e)
   }
 
   ngOnInit() {
+  }
+
+  configureLink(id){
+    if(this.sourceSelectedNode != null){
+      let srcElement = this.list.find((e)=>e.id==this.sourceSelectedNode).id;
+      let srcElement2 = this.list.find((e)=>e.id==id).id;
+      
+      this.link = [...this.link, {id: `${srcElement}-${srcElement2}`, source: srcElement, target:srcElement2, label:"label truc"}];
+      this.sourceSelectedNode = null;
+    } else this.sourceSelectedNode = id;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
