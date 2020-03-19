@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, SimpleChanges } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 // import { ngx-graph } from '@swimlane/ngx-graph';
 
@@ -8,10 +8,9 @@ import { Drag } from 'src/app/interfaces/drag.interface';
   styleUrls: ['./canvas.component.scss']
 })
 export class CanvasComponent implements OnInit {
+  @Input() newEntity;
 
-  @Input() list: {id: string, label: string};
-
-  nodes: Array<Drag> = [
+  list: Array<Drag> = [
     {
       id: 'first',
       label: 'A'
@@ -24,9 +23,21 @@ export class CanvasComponent implements OnInit {
     }
   ];
 
-  constructor() { }
+  constructor() { 
+  }
 
   ngOnInit() {
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+    //Add '${implements OnChanges}' to the class.
+    if (changes['newEntity'].currentValue) {
+      this.addNewEntity(changes["newEntity"].currentValue);
+    }
+  }
+  private addNewEntity(newEntity: Drag) {
+    this.list = [...this.list, newEntity];
   }
 
 }

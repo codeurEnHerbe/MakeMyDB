@@ -8,7 +8,10 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 })
 export class EditorComponent implements OnInit {
 
-  list: Array<Drag> = [];
+  newEntity;
+
+  
+
 
   constructor() { }
 
@@ -17,6 +20,6 @@ export class EditorComponent implements OnInit {
 
 
   public createDrag(event){
-    this.list.push(event);
+    this.newEntity = event;
   }
 }
