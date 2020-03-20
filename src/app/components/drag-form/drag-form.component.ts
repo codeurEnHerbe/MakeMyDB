@@ -1,5 +1,6 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
+import { MouseAction } from '../tool-box/tool-box.component';
 
 @Component({
   selector: 'app-drag-form',

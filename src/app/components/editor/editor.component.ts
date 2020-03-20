@@ -9,11 +9,13 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 export class EditorComponent implements OnInit {
 
   newEntity;
-
+  mouseStat;
   
-
-
   constructor() { }
+
+  setStat(e){
+    this.mouseStat=e;
+  }
 
   ngOnInit() {
   }
