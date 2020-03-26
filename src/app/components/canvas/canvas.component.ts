@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, SimpleChanges } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 import { SchemaRestService, SchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
+import * as d3 from 'd3';
 // import { ngx-graph } from '@swimlane/ngx-graph';
 
 @Component({
@@ -10,82 +11,80 @@ import { MouseAction } from '../tool-box/tool-box.component';
   styleUrls: ['./canvas.component.scss']
 })
 export class CanvasComponent implements OnInit {
+
   @Input() newEntity;
 
-  @Input() mouseStat = MouseAction.LINK;
+  @Input() mouseStat? = MouseAction.LINK;
 
   sourceSelectedNode: string = null;
 
-  list: Array<Drag> = [
-    {
-      id: 'first',
-      label: 'A',
-      x: 10,
-      y: 10
-    }, {
-      id: 'second',
-      label: 'B',
-      x: 100,
-      y: 100
-    }, {
-      id: 'third',
-      label: 'C',
-      x: 100,
-      y: 150
-    }
-  ];
-
-  link = [
-    {
-      id: 'a',
-      source: 'first',
-      target: 'second',
-      label: 'is parent of'
-    }, {
-      id: 'b',
-      source: 'first',
-      target: 'third',
-      label: 'custom label'
-    }
-  ];
-
   loadedAllSchemasByName: Array<SchemaDTO> = [];
+
+  WIDTH = 800;
+  HEIGHT = 600;
+  MARGIN = {RIGHT: 0, LEFT: 0, TOP: 0, BOTTOM: 0};
+  LINK_COLOR = "#b3b3b3";
+  svg;
+  defs;
+
+  node;
+
+  rects;
+
+  canDrag: boolean;
 
   constructor(private schemaRestService:SchemaRestService) { 
   }
 
-  getNodeXY(link){
-    const node1 = this.list.find((n)=>n.id==link.source);
-    const node2 = this.list.find((n)=>n.id==link.target);
+  ngOnInit(){
+    this.svg = d3.select("#chart").append("svg")
+      .attr("width", this.WIDTH + this.MARGIN.LEFT + this.MARGIN.RIGHT)
+      .attr("height", this.HEIGHT + this.MARGIN.TOP + this.MARGIN.BOTTOM)
+      .attr("transform", "translate(" + this.MARGIN.LEFT + "," + this.MARGIN.TOP + ")");
 
-    let result = {
-      source:{x: node1.x, y: node1.y},
-      target:{x: node2.x, y: node2.y}
-    };
+      this.rects = [{
+        id:1,
+        x:10,
+        y: 120,
+        width: 200,
+        height: 40
+      },{
+        id:2,
+        x:40,
+        y: 40,
+        width: 20,
+        height: 20
+      }]
 
-    console.log(result)
+      this.svg.append('rect')
+      .data(this.rects)
+      .attr('id', 'rect')
+      .attr('x', d=>d.x)
+      .attr('y', d=>d.y)
+      .attr('width', d=>d.width)
+      .attr('height', d=>d.height)
+      .attr('stroke', 'black')
+      .attr('fill', 'green')
+      .call(this.drag(this.canGrab,this))
+      
+      this.svg.append('line')
+      .attr('x1', 10)
+      .attr('y1', 10)
+      .attr('x2', 700)
+      .attr('y2', 100)
+      .attr('stroke', 'black')
 
-    return result;
+      console.log(this.mouseStat)
   }
 
   print(e){
     console.log(e)
   }
 
-  ngOnInit() {
-  }
-
   nodeClick(id){
     switch(this.mouseStat){
-
       case MouseAction.LINK :
-        if(this.sourceSelectedNode != null){
-          let srcElement = this.list.find((e)=>e.id==this.sourceSelectedNode).id;
-          let srcElement2 = this.list.find((e)=>e.id==id).id;
-          
-          this.link = [...this.link, {id: `${srcElement}-${srcElement2}`, source: srcElement, target:srcElement2, label:"label truc"}];
-          this.sourceSelectedNode = null;
-        } else this.sourceSelectedNode = id;
+         //TODO REDO
         break;
 
         case MouseAction.EDIT:
@@ -95,12 +94,7 @@ export class CanvasComponent implements OnInit {
         case MouseAction.GRAB:
 
         break;
-
       }
-  }
-
-  canGrab(){
-    return this.mouseStat == MouseAction.GRAB;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -111,7 +105,41 @@ export class CanvasComponent implements OnInit {
     }
   }
   private addNewEntity(newEntity: Drag) {
-    this.list = [...this.list, newEntity];
+    this.rects.push({
+      id:newEntity.id,
+      x: d3.event.dx,
+      y: d3.event.dy,
+      width: 200,
+      height: 40
+    })
+  }
+
+  canGrab(instance) {
+    return instance.mouseStat;
+  }
+
+  drag(mouseStat, instance){
+    
+    function dragstarted(d) {
+      //A utiliser un jour (peut être)
+    }
+  
+    function dragged(d) {
+      if(mouseStat(instance) == MouseAction.GRAB){
+        d.x += d3.event.dx;
+        d.y += d3.event.dy;
+        d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+      }
+    }
+  
+    function dragended(d) {
+      //A utiliser un jour (peut être)
+    }
+  
+    return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
   }
 
   loadAllSchemasByName(){
