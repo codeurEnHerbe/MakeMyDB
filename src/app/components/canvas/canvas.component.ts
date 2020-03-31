@@ -27,9 +27,9 @@ export class CanvasComponent implements OnInit {
   svg;
   defs;
 
-  rects: any[];
+  rects: Drag[];
   links: any[];
-  linksElements;
+  linksElements: {_groups:any[]};
 
   canDrag: boolean;
 
@@ -68,22 +68,10 @@ export class CanvasComponent implements OnInit {
         elem: null
       }]
 
-      this.svg.selectAll(".node")
-      .data(this.rects)
-      .enter()
-      .append('rect')
-      .attr('id', d=>d.id)
-      .attr('x', d=>d.x)
-      .attr('y', d=>d.y)
-      .attr('width', d=>d.width)
-      .attr('height', d=>d.height)
-      .attr('stroke', 'black')
-      .attr('fill', 'green')
-      .call(this.drag(this.canGrab,this))
+      this.makeRects(this.rects);
       
-      this.makeLine();
-
-      console.log(this.mouseStat)
+      this.linksElements = this.makeLines(this.links);
+      console.log( this.linksElements)
   }
 
   print(e){
@@ -93,7 +81,17 @@ export class CanvasComponent implements OnInit {
   nodeClick(id){
     switch(this.mouseStat){
       case MouseAction.LINK :
-         //TODO REDO
+         if(this.sourceSelectedNode){
+           const newLine = {source:this.sourceSelectedNode, target:id};
+          this.links.push(newLine)
+          const newLineSVG =  this.makeLines([newLine])._groups[0]
+          console.log(newLineSVG)
+          this.linksElements._groups.push( newLineSVG );
+          this.sourceSelectedNode = null;
+         }else{
+          this.sourceSelectedNode = id;
+         }
+         
         break;
 
         case MouseAction.EDIT:
@@ -114,20 +112,15 @@ export class CanvasComponent implements OnInit {
     }
   }
   private addNewEntity(newEntity: Drag) {
-    this.rects.push({
-      id:newEntity.id,
-      x: d3.event.dx,
-      y: d3.event.dy,
-      width: 200,
-      height: 40
-    })
+    newEntity.x = 10;
+    newEntity.y = 80;
+    newEntity.width = 200;
+    newEntity.height = 40;
+    this.rects.push(newEntity)
+    this.makeRects([newEntity])
   }
 
-  canGrab(instance) {
-    return instance.mouseStat;
-  }
-
-  drag(mouseStat, instance){
+  drag(instance: CanvasComponent){
 
     function dragstarted(d) {
       //A utiliser un jour (peut être)
@@ -135,14 +128,18 @@ export class CanvasComponent implements OnInit {
     }
   
     function dragged(d) {
-      if(mouseStat(instance) == MouseAction.GRAB){
+      if(instance.mouseStat == MouseAction.GRAB){
+        //Update du drag
         d.x += d3.event.dx;
         d.y += d3.event.dy;
+
+        //Update du svg
         d3.select(this)
         .attr('x',d3.event.x)
         .attr('y',d3.event.y)
         .raise();
-        instance.updateLinksByElem(d.id);
+        
+        instance.updateLinksByElem(d);
       }
     }
   
@@ -156,12 +153,28 @@ export class CanvasComponent implements OnInit {
       .on("end", dragended);
   }
 
-  private makeLine(){
-    this.linksElements = this.svg.selectAll(".node")
-      .data(this.links)
+  private makeRects(rects){
+      this.svg.selectAll(".node")
+      .data(rects)
+      .enter()
+      .append('rect')
+      .attr('id', d=>d.id)
+      .attr('x', d=>d.x)
+      .attr('y', d=>d.y)
+      .attr('width', d=>d.width)
+      .attr('height', d=>d.height)
+      .attr('stroke', 'black')
+      .attr('fill', 'green')
+      .call(this.drag(this))
+      .on("click",d=>this.nodeClick(d.id))
+  }
+
+  private makeLines(links){
+    return this.svg.selectAll(".node")
+      .data(links)
       .enter()
       .append('line')
-      .attr('id', d=>d.source+"-"+d.target)
+      .attr('id', d=>d.source+"@"+d.target)
       .attr('x1', d=>this.getElementById(d.source).x)
       .attr('y1', d=>this.getElementById(d.source).y)
       .attr('x2', d=>this.getElementById(d.target).x)
@@ -170,20 +183,21 @@ export class CanvasComponent implements OnInit {
       .lower()
   }
 
-  updateLinksByElem(id: number){
+  private updateLinksByElem(id){
+
     this.linksElements._groups.forEach(elem => {
       const link = elem[0];
-      const source = link.id.split("-")[0];
-      const target = link.id.split("-")[1];
+      const source = link.id.split("@")[0];
+      const target = link.id.split("@")[1];
       const linkElement = d3.select(link);
-      console.log(link,"::", linkElement)
       let x = d3.event.x;
       let y = d3.event.y;
-      if(id == source){
+
+      if(id.id == source){
         const sourceElem = this.getElementById(source);
         linkElement.attr("x1", x + sourceElem.width/2)
         .attr("y1", y + sourceElem.height/2);
-      }else if(id == target){
+      }else if(id.id == target){
         const targetElem = this.getElementById(target);
         linkElement.attr("x2",x + targetElem.width/2)
         .attr("y2",y + targetElem.height/2 ) ;

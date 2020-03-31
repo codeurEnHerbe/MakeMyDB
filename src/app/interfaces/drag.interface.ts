@@ -1,6 +1,8 @@
 export interface Drag{
-    id: string;
-    label: string;
+    id: any;
+    label?: string;
     x?: number;
-    y?: number
+    y?: number;
+    width?: number;
+    height?: number;
 }
