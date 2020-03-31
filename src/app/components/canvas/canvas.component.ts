@@ -27,9 +27,9 @@ export class CanvasComponent implements OnInit {
   svg;
   defs;
 
-  node;
-
-  rects;
+  rects: any[];
+  links: any[];
+  linksElements;
 
   canDrag: boolean;
 
@@ -54,11 +54,25 @@ export class CanvasComponent implements OnInit {
         y: 40,
         width: 20,
         height: 20
+      },{
+        id:3,
+        x:60,
+        y: 40,
+        width: 20,
+        height: 20
+      }];
+
+      this.links = [{
+        source: 2,
+        target: 1,
+        elem: null
       }]
 
-      this.svg.append('rect')
+      this.svg.selectAll(".node")
       .data(this.rects)
-      .attr('id', 'rect')
+      .enter()
+      .append('rect')
+      .attr('id', d=>d.id)
       .attr('x', d=>d.x)
       .attr('y', d=>d.y)
       .attr('width', d=>d.width)
@@ -67,12 +81,7 @@ export class CanvasComponent implements OnInit {
       .attr('fill', 'green')
       .call(this.drag(this.canGrab,this))
       
-      this.svg.append('line')
-      .attr('x1', 10)
-      .attr('y1', 10)
-      .attr('x2', 700)
-      .attr('y2', 100)
-      .attr('stroke', 'black')
+      this.makeLine();
 
       console.log(this.mouseStat)
   }
@@ -119,16 +128,21 @@ export class CanvasComponent implements OnInit {
   }
 
   drag(mouseStat, instance){
-    
+
     function dragstarted(d) {
       //A utiliser un jour (peut être)
+      console.log(instance.rects)
     }
   
     function dragged(d) {
       if(mouseStat(instance) == MouseAction.GRAB){
         d.x += d3.event.dx;
         d.y += d3.event.dy;
-        d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+        d3.select(this)
+        .attr('x',d3.event.x)
+        .attr('y',d3.event.y)
+        .raise();
+        instance.updateLinksByElem(d.id);
       }
     }
   
@@ -140,6 +154,51 @@ export class CanvasComponent implements OnInit {
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended);
+  }
+
+  private makeLine(){
+    this.linksElements = this.svg.selectAll(".node")
+      .data(this.links)
+      .enter()
+      .append('line')
+      .attr('id', d=>d.source+"-"+d.target)
+      .attr('x1', d=>this.getElementById(d.source).x)
+      .attr('y1', d=>this.getElementById(d.source).y)
+      .attr('x2', d=>this.getElementById(d.target).x)
+      .attr('y2', d=>this.getElementById(d.target).y)
+      .attr('stroke', 'black')
+      .lower()
+  }
+
+  updateLinksByElem(id: number){
+    this.linksElements._groups.forEach(elem => {
+      const link = elem[0];
+      const source = link.id.split("-")[0];
+      const target = link.id.split("-")[1];
+      const linkElement = d3.select(link);
+      console.log(link,"::", linkElement)
+      let x = d3.event.x;
+      let y = d3.event.y;
+      if(id == source){
+        const sourceElem = this.getElementById(source);
+        linkElement.attr("x1", x + sourceElem.width/2)
+        .attr("y1", y + sourceElem.height/2);
+      }else if(id == target){
+        const targetElem = this.getElementById(target);
+        linkElement.attr("x2",x + targetElem.width/2)
+        .attr("y2",y + targetElem.height/2 ) ;
+      }
+    });
+  }
+
+  getElementById(id: number){
+    let elem = Object.create(this.rects.find( elem=>elem.id == id) );
+    if(elem){
+      elem.x = elem.x+elem.width/2 ;
+      elem.y = elem.y+elem.height/2 ;
+      return elem;
+    }else
+      return null;
   }
 
   loadAllSchemasByName(){
