@@ -14,7 +14,7 @@ export class CanvasComponent implements OnInit {
 
   @Input() newEntity;
 
-  @Input() mouseStat? = MouseAction.LINK;
+  @Input() mouseStat;
 
   sourceSelectedNode: string = null;
 
@@ -30,6 +30,7 @@ export class CanvasComponent implements OnInit {
   dragableElements: Drag[] = [];
   links: any[] = [];
   linksElements: {_groups:any[]};
+  
   groupeTextsElements = [];
 
   canDrag: boolean;
@@ -60,7 +61,6 @@ export class CanvasComponent implements OnInit {
            const newLine = {source:this.sourceSelectedNode, target:id};
           this.links.push(newLine)
           const newLineSVG =  this.makeLines([newLine])._groups[0]
-          console.log(newLineSVG)
           this.linksElements._groups.push( newLineSVG );
           this.sourceSelectedNode = null;
          }else{
@@ -114,6 +114,7 @@ export class CanvasComponent implements OnInit {
 
         //Update du svg
         d3.select(this)
+        //.attr('transform', "translate("+d3.event.x+","+d3.event.y+")")
         .attr('x',d3.event.x)
         .attr('y',d3.event.y)
         .raise();
@@ -145,6 +146,17 @@ export class CanvasComponent implements OnInit {
         .attr('y', d=>d.y)
         .attr('width', d=>d.width)
         .attr('height', d=>d.height)
+        .append('text')
+          .attr('id', "name")
+          .attr("width", d=>d.width)
+          .attr("height", d=>d.height)
+          .style("fill", "red")
+          .text( (d:Drag)=>d.element.name )
+          .select( function() {return this.parentNode;});
+
+      this.svg.selectAll(".node")
+      .data([newEntity])
+      .enter()
       .append('rect')
         .attr('id', d=>d.id)
         .attr('width', d=>d.width)
@@ -153,16 +165,7 @@ export class CanvasComponent implements OnInit {
         .attr('fill', 'green')
         .call(this.drag(this))
         .on("click",d=>this.nodeClick(d.id))
-      .select( function() {return this.parentNode;})
-      .append('text')
-        .attr('id', "name")
-        .attr("x", d=>d.x)
-        .attr("y", d=>d.y)
-        .attr("width", d=>d.width)
-        .attr("height", d=>d.height)
-        .style("fill", "red")
-        .text( (d:Drag)=>d.element.name )
-        .select( function() {return this.parentNode;});
+      //.select( function() {return this.parentNode;})
 
         this.groupeTextsElements.push(g);
     }
@@ -187,7 +190,6 @@ export class CanvasComponent implements OnInit {
     if( this.linksElements._groups.length > 0)
     this.linksElements._groups.forEach(elem => {
       if(elem.length){
-        console.log(this.linksElements._groups, elem)
         const link = elem[0];
         const source = link.id.split("@")[0];
         const target = link.id.split("@")[1];
@@ -212,10 +214,7 @@ export class CanvasComponent implements OnInit {
     });
 
     if(groupeTexts){
-      console.log(groupeTexts)
-      d3.select(groupeTexts)
-      //TODO
-      .attr("transform", function() {return "translate("+d3.event.dx+","+d3.event.dy+")"})
+      groupeTexts.attr("transform", function(d,i) {console.log(d,i);return "translate("+d3.event.x+","+d3.event.y+")"})
       .raise();
     }
   }

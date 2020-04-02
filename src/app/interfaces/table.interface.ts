@@ -6,7 +6,7 @@ export interface Table{
         name: string,
         type: Type,
         isPrimary: boolean,
-        foreignTable: Table | null,
-        foreignAttribute: string | null
+        foreignTable?: Table,
+        foreignAttribute?: string
     }>
 }

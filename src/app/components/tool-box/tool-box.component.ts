@@ -12,8 +12,8 @@ export enum MouseAction {
 export class ToolBoxComponent implements OnInit {
 
   @Output("stat")
-  eventEmiter: EventEmitter<string> = new EventEmitter;
-  stat: MouseAction;
+  eventEmiter: EventEmitter<MouseAction> = new EventEmitter<MouseAction>();
+  stat: MouseAction = MouseAction.GRAB;
 
   constructor() {
   }
