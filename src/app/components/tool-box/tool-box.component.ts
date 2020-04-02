@@ -13,7 +13,7 @@ export class ToolBoxComponent implements OnInit {
 
   @Output("stat")
   eventEmiter: EventEmitter<string> = new EventEmitter;
-  stat: MouseAction = MouseAction.GRAB;
+  stat: MouseAction;
 
   constructor() {
   }
@@ -40,6 +40,7 @@ export class ToolBoxComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.setActionGrab();
   }
 
 }

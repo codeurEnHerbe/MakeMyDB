@@ -1,3 +1,5 @@
+import { Table } from './table.interface';
+
 export interface Drag{
     id: any;
     label?: string;
@@ -5,4 +7,5 @@ export interface Drag{
     y?: number;
     width?: number;
     height?: number;
+    element: Table
 }

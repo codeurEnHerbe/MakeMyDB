@@ -1,32 +1,5 @@
 <div id="chart"></div>
 
-<!--
-<ngx-graph (click)="print($event)"
-  class="chart-container"
-  [curve]="curve"
-  [draggingEnabled]="canGrab()"
-  [view]="[800, 600]"
-  [links]="link"
-  [nodes]="list">
-  
-  <ng-template #nodeTemplate let-node >
-    <svg:g class="node" (click)="nodeClick($event.srcElement.id);">
-      <svg:rect [attr.id]="node.id" [attr.width]="node.dimension.width" [attr.height]="node.dimension.height" [attr.fill]="node.data.color" />
-      <svg:text [attr.id]="node.id" alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
-    </svg:g>
-  </ng-template>
-
-  <ng-template #linkTemplate let-link>
-    <svg:g class="edge">
-      <svg:path [attr.d]="'M'+getNodeXY(link).source.x+' '+getNodeXY(link).source.y+' L '+getNodeXY(link).target.x+' '+getNodeXY(link).target.y">
-      </svg:path>
-    </svg:g>
-  </ng-template>
-</ngx-graph>
--->
-
-
-
 <button (click)="loadAllSchemasByName()">Load Shema</button>
 
 <div *ngFor="let schema of loadedAllSchemasByName">

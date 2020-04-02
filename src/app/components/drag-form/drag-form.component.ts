@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
-import { MouseAction } from '../tool-box/tool-box.component';
+import { Table } from 'src/app/interfaces/table.interface';
 
 @Component({
   selector: 'app-drag-form',
@@ -18,7 +18,7 @@ export class DragFormComponent implements OnInit {
   }
 
   public createDrag() {
-    this.list.emit({ id: "id-"+this.dragName, label: this.dragName });
+    this.list.emit({ id: "id-"+this.dragName, label: this.dragName, element: {name:this.dragName, attributes: []} });
   }
 
 }

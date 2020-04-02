@@ -24,12 +24,13 @@ export class CanvasComponent implements OnInit {
   HEIGHT = 600;
   MARGIN = {RIGHT: 0, LEFT: 0, TOP: 0, BOTTOM: 0};
   LINK_COLOR = "#b3b3b3";
-  svg;
+  svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
   defs;
 
-  rects: Drag[];
-  links: any[];
+  dragableElements: Drag[] = [];
+  links: any[] = [];
   linksElements: {_groups:any[]};
+  groupeTextsElements = [];
 
   canDrag: boolean;
 
@@ -42,33 +43,7 @@ export class CanvasComponent implements OnInit {
       .attr("height", this.HEIGHT + this.MARGIN.TOP + this.MARGIN.BOTTOM)
       .attr("transform", "translate(" + this.MARGIN.LEFT + "," + this.MARGIN.TOP + ")");
 
-      this.rects = [{
-        id:1,
-        x:10,
-        y: 120,
-        width: 200,
-        height: 40
-      },{
-        id:2,
-        x:40,
-        y: 40,
-        width: 20,
-        height: 20
-      },{
-        id:3,
-        x:60,
-        y: 40,
-        width: 20,
-        height: 20
-      }];
-
-      this.links = [{
-        source: 2,
-        target: 1,
-        elem: null
-      }]
-
-      this.makeRects(this.rects);
+      this.newDragableElement(this.dragableElements, true);
       
       this.linksElements = this.makeLines(this.links);
       console.log( this.linksElements)
@@ -105,26 +80,30 @@ export class CanvasComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.
     if (changes['newEntity'] && changes['newEntity'].currentValue) {
       this.addNewEntity(changes["newEntity"].currentValue);
+      console.log("change")
     }
   }
-  private addNewEntity(newEntity: Drag) {
-    newEntity.x = 10;
-    newEntity.y = 80;
-    newEntity.width = 200;
-    newEntity.height = 40;
-    this.rects.push(newEntity)
-    this.makeRects([newEntity])
+  private addNewEntity(newEntity: Drag): boolean {
+    let foundElement = this.dragableElements.find( e => e.id == newEntity.id);
+    if(!foundElement){
+      newEntity.x = 10;
+      newEntity.y = 80;
+      newEntity.width = 200;
+      newEntity.height = 40;
+      this.dragableElements.push(newEntity)
+      this.newDragableElement(newEntity)
+      return true
+    }
+    return false
   }
 
   drag(instance: CanvasComponent){
 
     function dragstarted(d) {
       //A utiliser un jour (peut être)
-      console.log(instance.rects)
+      console.log(instance.dragableElements)
     }
   
     function dragged(d) {
@@ -153,60 +132,96 @@ export class CanvasComponent implements OnInit {
       .on("end", dragended);
   }
 
-  private makeRects(rects){
-      this.svg.selectAll(".node")
-      .data(rects)
+  private newDragableElement(newEntity, multipleElements=false){
+    if(multipleElements){
+
+    }else{
+      const g = this.svg.selectAll(".node")
+      .data([newEntity])
       .enter()
+      .append('g')
+        .attr('id', d=>d.id)
+        .attr('x', d=>d.x)
+        .attr('y', d=>d.y)
+        .attr('width', d=>d.width)
+        .attr('height', d=>d.height)
       .append('rect')
-      .attr('id', d=>d.id)
-      .attr('x', d=>d.x)
-      .attr('y', d=>d.y)
-      .attr('width', d=>d.width)
-      .attr('height', d=>d.height)
-      .attr('stroke', 'black')
-      .attr('fill', 'green')
-      .call(this.drag(this))
-      .on("click",d=>this.nodeClick(d.id))
+        .attr('id', d=>d.id)
+        .attr('width', d=>d.width)
+        .attr('height', d=>d.height)
+        .attr('stroke', 'black')
+        .attr('fill', 'green')
+        .call(this.drag(this))
+        .on("click",d=>this.nodeClick(d.id))
+      .select( function() {return this.parentNode;})
+      .append('text')
+        .attr('id', "name")
+        .attr("x", d=>d.x)
+        .attr("y", d=>d.y)
+        .attr("width", d=>d.width)
+        .attr("height", d=>d.height)
+        .style("fill", "red")
+        .text( (d:Drag)=>d.element.name )
+        .select( function() {return this.parentNode;});
+
+        this.groupeTextsElements.push(g);
+    }
   }
 
-  private makeLines(links){
+  private makeLines(links): any{
     return this.svg.selectAll(".node")
       .data(links)
       .enter()
       .append('line')
-      .attr('id', d=>d.source+"@"+d.target)
-      .attr('x1', d=>this.getElementById(d.source).x)
-      .attr('y1', d=>this.getElementById(d.source).y)
-      .attr('x2', d=>this.getElementById(d.target).x)
-      .attr('y2', d=>this.getElementById(d.target).y)
+      .attr('id', (d:any)=>d.source+"@"+d.target)
+      .attr('x1', (d:any)=>this.getElementById(d.source).x)
+      .attr('y1', (d:any)=>this.getElementById(d.source).y)
+      .attr('x2', (d:any)=>this.getElementById(d.target).x)
+      .attr('y2', (d:any)=>this.getElementById(d.target).y)
       .attr('stroke', 'black')
       .lower()
   }
 
-  private updateLinksByElem(id){
+  private updateLinksByElem(element){
 
+    if( this.linksElements._groups.length > 0)
     this.linksElements._groups.forEach(elem => {
-      const link = elem[0];
-      const source = link.id.split("@")[0];
-      const target = link.id.split("@")[1];
-      const linkElement = d3.select(link);
-      let x = d3.event.x;
-      let y = d3.event.y;
+      if(elem.length){
+        console.log(this.linksElements._groups, elem)
+        const link = elem[0];
+        const source = link.id.split("@")[0];
+        const target = link.id.split("@")[1];
+        const linkElement = d3.select(link);
+        let x = d3.event.x;
+        let y = d3.event.y;
 
-      if(id.id == source){
-        const sourceElem = this.getElementById(source);
-        linkElement.attr("x1", x + sourceElem.width/2)
-        .attr("y1", y + sourceElem.height/2);
-      }else if(id.id == target){
-        const targetElem = this.getElementById(target);
-        linkElement.attr("x2",x + targetElem.width/2)
-        .attr("y2",y + targetElem.height/2 ) ;
+        if(element.id == source){
+          const sourceElem = this.getElementById(source);
+          linkElement.attr("x1", x + sourceElem.width/2)
+          .attr("y1", y + sourceElem.height/2);
+        }else if(element.id == target){
+          const targetElem = this.getElementById(target);
+          linkElement.attr("x2",x + targetElem.width/2)
+          .attr("y2",y + targetElem.height/2 ) ;
+        }
       }
     });
+
+    const groupeTexts = this.groupeTextsElements.find(e=>{
+      return e._groups[0][0].id == element.id
+    });
+
+    if(groupeTexts){
+      console.log(groupeTexts)
+      d3.select(groupeTexts)
+      //TODO
+      .attr("transform", function() {return "translate("+d3.event.dx+","+d3.event.dy+")"})
+      .raise();
+    }
   }
 
   getElementById(id: number){
-    let elem = Object.create(this.rects.find( elem=>elem.id == id) );
+    let elem = Object.create(this.dragableElements.find( elem=>elem.id == id) );
     if(elem){
       elem.x = elem.x+elem.width/2 ;
       elem.y = elem.y+elem.height/2 ;
