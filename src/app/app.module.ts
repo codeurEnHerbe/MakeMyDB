@@ -7,7 +7,6 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragFormComponent } from './components/drag-form/drag-form.component';
 import { EditorComponent } from './components/editor/editor.component';
-import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { HttpClientModule } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
@@ -27,7 +26,6 @@ import { ToolBoxComponent } from './components/tool-box/tool-box.component';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    NgxGraphModule,
     FormsModule,
     HttpClientModule
   ],
