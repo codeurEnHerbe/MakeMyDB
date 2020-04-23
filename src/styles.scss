@@ -31,4 +31,4 @@ $MakeMyDB-theme: mat-light-theme($MakeMyDB-primary, $MakeMyDB-accent, $MakeMyDB-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import '~bootstrap/dist/css/bootstrap.min.css';

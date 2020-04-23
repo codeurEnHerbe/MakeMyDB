@@ -12,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { SchemaRestService } from './services/schema-rest.service';
 import { ToolBoxComponent } from './components/tool-box/tool-box.component';
+import { IndexComponent } from './components/index/index.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { ToolBoxComponent } from './components/tool-box/tool-box.component';
     CanvasComponent,
     DragFormComponent,
     EditorComponent,
-    ToolBoxComponent
+    ToolBoxComponent,
+    IndexComponent
   ],
   imports: [
     BrowserModule,
