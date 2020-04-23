@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { SchemaRestService } from './services/schema-rest.service';
 import { ToolBoxComponent } from './components/tool-box/tool-box.component';
 import { IndexComponent } from './components/index/index.component';
-
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,8 @@ import { IndexComponent } from './components/index/index.component';
     DragFormComponent,
     EditorComponent,
     ToolBoxComponent,
-    IndexComponent
+    IndexComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

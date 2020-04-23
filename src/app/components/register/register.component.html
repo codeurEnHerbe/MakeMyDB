@@ -1,0 +1,20 @@
+<form class="form-horizontal" action='' method="POST">
+  <fieldset>
+    <div id="legend">
+      <legend class="">Register</legend>
+    </div>
+    <div class="control-group" *ngFor="let input of inputs;">
+      <label class="control-label" for="input.value">{{input.name}}</label>
+      <div class="controls">
+        <input type="input.type" (value)="input.value" placeholder="" class="input-xlarge">
+        <p *ngIf="input.error && input.error.inputValidationStatus" class="error-block">{{input.error.errorMessage}}</p>
+      </div>
+    </div>
+    <div class="control-group">
+      <!-- Button -->
+      <div class="controls">
+        <button class="btn btn-success" (click)="register()">Register</button>
+      </div>
+    </div>
+  </fieldset>
+</form>
