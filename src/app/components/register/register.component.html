@@ -1,19 +1,37 @@
-<form class="form-horizontal" action='' method="POST">
+<form [formGroup]="registerForm" (ngSubmit)="onFormSubmit()">
   <fieldset>
     <div id="legend">
       <legend class="">Register</legend>
     </div>
-    <div class="control-group" *ngFor="let input of inputs;">
-      <label class="control-label" for="input.value">{{input.name}}</label>
+    <div class="control-group">
+      <label class="control-label">Email</label>
       <div class="controls">
-        <input type="input.type" (value)="input.value" placeholder="" class="input-xlarge">
-        <p *ngIf="input.error && input.error.inputValidationStatus" class="error-block">{{input.error.errorMessage}}</p>
+        <input type="input.type" formControlName="email" placeholder="" class="input-xlarge">
+        <p *ngIf="registerForm.email.hasError('emailTaken')" style="color: red">This email is already taken</p>
       </div>
     </div>
     <div class="control-group">
-      <!-- Button -->
+      <label class="control-label">UserName</label>
       <div class="controls">
-        <button class="btn btn-success" (click)="register()">Register</button>
+        <input type="input.type" formControlName="userName" placeholder="" class="input-xlarge">
+        <p *ngIf="registerForm.userName.hasError('usernameTaken')" style="color: red">This username is already taken</p>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Password</label>
+      <div class="controls">
+        <input type="input.type" formControlName="password" placeholder="" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Password Confirm</label>
+      <div class="controls">
+        <input type="input.type" formControlName="confirmPassword" placeholder="" class="input-xlarge">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button [ngClass]="{'disabled-button': registerForm.invalid}" [disabled]="registerForm.invalid" class="btn btn-success" type="submit">Register</button>
       </div>
     </div>
   </fieldset>

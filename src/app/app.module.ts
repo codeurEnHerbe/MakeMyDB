@@ -7,13 +7,15 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragFormComponent } from './components/drag-form/drag-form.component';
 import { EditorComponent } from './components/editor/editor.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
 import { SchemaRestService } from './services/schema-rest.service';
 import { ToolBoxComponent } from './components/tool-box/tool-box.component';
 import { IndexComponent } from './components/index/index.component';
 import { RegisterComponent } from './components/register/register.component';
+import { BackendInterceptor } from './utils/backend/http-interceptor';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -30,9 +32,14 @@ import { RegisterComponent } from './components/register/register.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
-  providers: [SchemaRestService],
+  providers: [
+    SchemaRestService,
+    AppComponent,
+    { provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

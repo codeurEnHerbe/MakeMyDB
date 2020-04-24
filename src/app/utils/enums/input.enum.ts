@@ -4,7 +4,6 @@ export enum InputValidationUsername{
 }
 
 export enum InputValidationPassword{
-    NO_CAPS,
     NO_DIGIT,
     NO_LETTER,
     OK

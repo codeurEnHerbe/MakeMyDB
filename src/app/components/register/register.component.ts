@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
-import { InputValidationUsername } from '../../utils/enums/input.enum';
-import { IInputInfos } from '../../interfaces/inputs.interface';
-
+import { __core_private_testing_placeholder__ } from '@angular/core/testing';
+import { RegisterForm } from './register.form';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -10,55 +9,18 @@ import { IInputInfos } from '../../interfaces/inputs.interface';
 })
 export class RegisterComponent implements OnInit {
 
-  private inputIsValid = {
-    username: InputValidationUsername.OK,
-    email: false,
-    password: false,
-    passwordConfirm: false,
-  }
+  public registerForm: RegisterForm;
 
-  public inputs: Array<IInputInfos> = [
-    {
-      name: "Username",
-      value: "username",
-      type: "text",
-      error: {
-        inputValidationStatus: this.inputIsValid.username === 1,
-        errorMessage: "This username is already taken"
-      }
-    },
-    {
-      name: "Password",
-      value: "password",
-      type: "password"
-    },
-    {
-      name: "Confirm Password",
-      value: "passwordConfirm",
-      type: "password"
-    }
-  ]
-  public username: string = "";
-  public password: string = "";
-  public passwordConfirm: string = "";
-
-
-  constructor(private userService:UserService) { 
+  constructor(private userService: UserService) {
+    this.registerForm = new RegisterForm(userService);
   }
 
   ngOnInit() {
   }
 
-  register(){
-    this.checkInputs();
-  }
-
-  private checkInputs() {
-    if(!this.username){
-      this.userService.checkUserName(this.username).subscribe(isValid => {
-        isValid ? this.inputIsValid.username = InputValidationUsername.OK : this.inputIsValid.username = InputValidationUsername.TAKEN;
-        console.log(this.inputIsValid.username);
-      })
+  register() {
+    if (this.registerForm.valid) {
+      this.userService.register(this.registerForm.value);
     }
   }
 }
