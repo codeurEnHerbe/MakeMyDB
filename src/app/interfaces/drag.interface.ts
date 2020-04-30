@@ -1,7 +1,7 @@
 import { Table } from './table.interface';
 
 export interface Drag{
-    id: any;
+    elementId: any;
     label?: string;
     x?: number;
     y?: number;
