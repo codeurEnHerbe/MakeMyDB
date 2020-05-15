@@ -1,6 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
-import { Table } from 'src/app/interfaces/table.interface';
 
 @Component({
   selector: 'app-drag-form',

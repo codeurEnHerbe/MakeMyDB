@@ -1,6 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface'
-import { Table } from 'src/app/interfaces/table.interface'
 
 export enum MouseAction {
   GRAB = "Grab", EDIT = "Edit", LINK="Link"

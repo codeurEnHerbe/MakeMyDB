@@ -1,4 +1,4 @@
-import { Table } from './table.interface';
+import { Entity } from './entity.interface';
 
 export interface Drag{
     elementId: any;
@@ -7,5 +7,5 @@ export interface Drag{
     y?: number;
     width?: number;
     height?: number;
-    element: Table
+    element: Entity
 }

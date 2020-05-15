@@ -16,6 +16,7 @@ import { IndexComponent } from './components/index/index.component';
 import { RegisterComponent } from './components/register/register.component';
 import { BackendInterceptor } from './utils/backend/http-interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
+import { EntityEditionComponent } from './components/canvas/entity-edition/entity-edition.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     EditorComponent,
     ToolBoxComponent,
     IndexComponent,
-    RegisterComponent
+    RegisterComponent,
+    EntityEditionComponent
   ],
   imports: [
     BrowserModule,

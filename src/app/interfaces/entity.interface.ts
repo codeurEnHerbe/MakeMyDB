@@ -1,12 +1,12 @@
 import { Type } from './type.enum';
 
-export interface Table{
+export interface Entity{
     name: string;
     attributes: Array<{
         name: string,
         type: Type,
         isPrimary: boolean,
-        foreignTable?: Table,
+        foreignTable?: Entity,
         foreignAttribute?: string
     }>
 }

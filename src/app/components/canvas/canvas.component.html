@@ -6,24 +6,4 @@
   <label>{{schema.id}} : {{schema.name}}</label>
 </div>
 
-
-<div class="display: inline-block;border: 1px solid black;background-color: rgb(112, 215, 255);">
-  <div class="text-align: center;padding: 5px;">title</div>
-  <div class="display: block;width: 100%;height: 1px;background-color: black;"></div>
-  <div>
-    <table>
-      <tr>
-        <td class="text-align: left;padding-left: 5px; text-decoration: underline;">idElement</td>
-        <td class="text-align: right;padding-right: 5px;padding-left: 10px;">serial</td>
-      </tr>
-        <tr>
-          <td class="text-align: left;padding-left: 5px;">chose</td>
-          <td class="text-align: right;padding-right: 5px;padding-left: 10px;">integer</td>
-        </tr>
-        <tr>
-          <td class="text-align: left;padding-left: 5px;">name</td>
-          <td class="text-align: right;padding-right: 5px;padding-left: 10px;">string</td>
-        </tr>
-    </table>
-  </div>
-</div>
+<app-entity-edition [entity]="entity" (event)="updateElement($event)"></app-entity-edition>
