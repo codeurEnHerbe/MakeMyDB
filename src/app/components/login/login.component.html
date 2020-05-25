@@ -1,0 +1,21 @@
+<div id="legend">
+    <legend class="">Login</legend>
+</div>
+<div class="control-group">
+    <label class="control-label">Username</label>
+    <div class="controls">
+        <input type="text" [(ngModel)]="username" placeholder="" class="input-xlarge">
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label">Password</label>
+    <div class="controls">
+        <input type="password" [(ngModel)]="password" placeholder="" class="input-xlarge">
+    </div>
+</div>
+<p *ngIf="loginStatus" style="color: red">{{loginStatus}}</p>
+<div class="control-group">
+    <div class="controls">
+        <button class="btn btn-success" (click)="login()">Login</button>
+    </div>
+</div>

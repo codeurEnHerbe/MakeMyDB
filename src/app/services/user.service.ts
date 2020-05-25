@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { IInputInfos } from '../interfaces/inputs.interface';
-import { HttpParams, HttpClient } from '@angular/common/http';
-import { BaseUrl } from '../utils/config/config';
-import { map } from 'rxjs/operators';
+import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
@@ -36,5 +33,17 @@ export class UserService {
 
   checkUserName(user: string): Observable<boolean> {
     return this.http.get<boolean>(`/users/check-username?username=${user}`);
+  }
+
+  login(username: string, password: string){
+
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'});
+    let options = { headers: headers };
+    
+    return this.http.post('/login', {
+      "username": username,
+      "password": password
+    }, options);
   }
 }

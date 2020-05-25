@@ -24,6 +24,7 @@
     "@swimlane/ngx-graph": "^6.2.0",
     "@types/d3": "^5.7.2",
     "bootstrap": "^4.4.1",
+    "cors": "^2.8.5",
     "d3": "^5.15.0",
     "jquery": "^3.4.1",
     "mxgraph": "^4.1.1",
