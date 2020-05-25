@@ -1,4 +1,4 @@
-<form [formGroup]="registerForm" (ngSubmit)="onFormSubmit()">
+<form [formGroup]="registerForm" (ngSubmit)="register()">
   <fieldset>
     <div id="legend">
       <legend class="">Register</legend>
@@ -6,27 +6,27 @@
     <div class="control-group">
       <label class="control-label">Email</label>
       <div class="controls">
-        <input type="input.type" formControlName="email" placeholder="" class="input-xlarge">
+        <input type="text" formControlName="email" placeholder="" class="input-xlarge">
         <p *ngIf="registerForm.email.hasError('emailTaken')" style="color: red">This email is already taken</p>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">UserName</label>
       <div class="controls">
-        <input type="input.type" formControlName="userName" placeholder="" class="input-xlarge">
+        <input type="text" formControlName="userName" placeholder="" class="input-xlarge">
         <p *ngIf="registerForm.userName.hasError('usernameTaken')" style="color: red">This username is already taken</p>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">Password</label>
       <div class="controls">
-        <input type="input.type" formControlName="password" placeholder="" class="input-xlarge">
+        <input type="password" formControlName="password" placeholder="" class="input-xlarge">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">Password Confirm</label>
       <div class="controls">
-        <input type="input.type" formControlName="confirmPassword" placeholder="" class="input-xlarge">
+        <input type="password" formControlName="confirmPassword" placeholder="" class="input-xlarge">
       </div>
     </div>
     <div class="control-group">
