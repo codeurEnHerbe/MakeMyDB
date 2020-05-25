@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Entity } from 'src/app/interfaces/entity.interface';
+import { Entity, Attribute } from 'src/app/interfaces/entity.interface';
 import { Type } from 'src/app/interfaces/type.enum';
-import { toArray } from 'rxjs/operators';
 
 
 @Component({
@@ -22,6 +21,7 @@ export class EntityEditionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.entity)
     this.types.forEach(element => {
       console.log(element)
     });
@@ -29,6 +29,12 @@ export class EntityEditionComponent implements OnInit {
 
   validate(){
     this.event.emit(this.entity);
+    console.log(this.entity)
   }
+
+  removeAttribute(attribute: Attribute){
+    this.entity.attributes.splice(this.entity.attributes.findIndex( attrib=>attrib.name == attribute.name), 1)
+  }
+
 
 }
