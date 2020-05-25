@@ -1,20 +1,35 @@
-<div style="position: absolute;top: calc(50% - 200px); left: calc(50% - 250px); float: left; width: 500px; height: 400px; background-color: rgba(255, 255, 255, 0.8);border: black 1px solid;">
+<div style="text-align: center;position: absolute;top: calc(50% - 200px); left: calc(50% - 250px); float: left; width: 500px; height: 400px; background-color: rgba(255, 255, 255, 0.8);border: black 1px solid;">
     <h3>{{entity.name}}</h3>
     <div class="separator"></div>
-    <table>
-        <div *ngFor="let attr of entity.attributes">
-            <tr>
-                <td class="name">
-                    <input type="text" [name]="'name-'+attr.name" [(value)]="attr.name">
-                </td>
-                <td class="type">
-                    <select [(value)]="attr.type">
-                            <option *ngFor="let type of types" [value]="type">{{type}}</option>
-                    </select>
-                </td>
-            </tr>
+    <table style="display: inline-block;">
+        <tr style="font-weight: bold;text-align: center;display: inline-block;">
+            <td style="width: 192px;">Nom</td>
+            <td style="width: 92px;">Type</td>
+            <td style="width: 92px;">Primaire</td>
+            <td style="width: 100px;"><button style="font-weight: bold;border: none; background: none;color: green;" (click)="entity.attributes.push({name:'', type:'varchar', isPrimary: false})">+</button></td>
+        </tr>
+        <div style="height: 280px;overflow-y: scroll;">
+            <div *ngFor="let attr of entity.attributes">
+                <tr>
+                    <td class="name">
+                        <input type="text" [name]="'name-'+attr.name" [(ngModel)]="attr.name">
+                    </td>
+                    <td class="type">
+                        <select [(ngModel)]="attr.type">
+                                <option *ngFor="let type of types" [value]="type">{{type}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="checkbox" [(ngModel)]="attr.isPrimary" style="width: 92px;">
+                    </td>
+                    <td>
+                        <button style="color: red; font-weight: bold;" (click)="removeAttribute(attr)">supprimer</button>
+                    </td>
+                </tr>
+            </div>
         </div>
     </table>
+    
     <button (click)="validate()">Valider</button>
 </div>
 

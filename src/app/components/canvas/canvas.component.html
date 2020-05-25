@@ -5,5 +5,6 @@
 <div *ngFor="let schema of loadedAllSchemasByName">
   <label>{{schema.id}} : {{schema.name}}</label>
 </div>
-
-<app-entity-edition [entity]="entity" (event)="updateElement($event)"></app-entity-edition>
+<div *ngIf="changeElement">
+  <app-entity-edition [entity]="entity" (event)="updateElement($event)"></app-entity-edition>
+</div>

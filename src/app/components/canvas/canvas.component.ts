@@ -27,15 +27,19 @@ import { Entity } from 'src/app/interfaces/entity.interface';
 
     mxGraph: typeof mxgraph;
     graph: mxgraph.mxGraph;
-    parent;
+    parent: mxgraph.mxCell;
 
     selectedElement;
+    
+    entitys: Entity[];
+
+    entity: Entity;
 
     changeElement: mxgraph.mxCell;
   
     constructor(private schemaRestService:SchemaRestService) { 
     }
-    entity: Entity;
+    
     ngOnInit(){
         this.oldNewEntity = this.newEntity;
         this.mxGraph = mxgraphFactory({
@@ -72,7 +76,10 @@ import { Entity } from 'src/app/interfaces/entity.interface';
                   this.selectedElement = null;
               }
             }else if(this.mouseStat == MouseAction.EDIT){
-
+              this.changeElement = evt.properties.cell;
+              this.entity
+              //this.entity = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false,foreignAttribute:"chose"},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}]};
+        
             }
           }
         });
@@ -103,16 +110,23 @@ import { Entity } from 'src/app/interfaces/entity.interface';
         var v1 = graph.insertVertex(parent, null, '<img src="https://yamikamisama.fr/dl/portal.gif" width="100px"/><b>BOLD</b>,\n pas bold', 50, 20, 80, 30);
         var v2 = graph.insertVertex(parent, null, '<div class="drag">  <b class="title">title</b>  <div class="separator" style="display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;"></div>  <div>    <table>      <tr>        <td class="name primary">idElement</td>        <td class="type">serial</td>      </tr>        <tr>          <td class="name">chose</td>          <td class="type">integer</td>        </tr>        <tr>          <td class="name">name</td>          <td class="type">string</td>        </tr>    </table>  </div></div>', 160, 20, 80, 30,"border: 1px solid black;    background-color: rgb(112, 215, 255);");
         var e1 = graph.insertEdge(parent, null, '', v1, v2);
-        this.entity = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false,foreignAttribute:"chose"},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}]};
-        this.addNewDrag({element: this.entity, elementId: "test"})
-        this.changeElement = this.addNewDrag({element: {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true}]}, elementId: "test"})
-        this.addNewDrag({element: {name:"test",attributes:[
+        
+        //this.addNewDrag({element: this.entity, elementId: "test"})
+        
+        let elem = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true}]};
+        this.addNewDrag({element: elem, elementId: "test"})
+        this.entitys.push(elem)
+
+        let defaultEntity =  {name:"test",attributes:[
           {name: "variableTest",type: Type.varchar,isPrimary: false},
           {name: "autre test",type: Type.int,isPrimary: true},
           {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},
           {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},
           {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}
-        ]}, elementId: "test"})
+        ]};
+
+        this.addNewDrag({element: defaultEntity, elementId: "test"});
+        this.entitys.push(defaultEntity)
       }
 
     ngOnChanges(){
@@ -132,9 +146,12 @@ import { Entity } from 'src/app/interfaces/entity.interface';
     }
 
     private updateElement($event){
-      console.log($event)
-      //TODO
-      this.changeElement.setValue(this.createGraphVertex({element: $event,elementId:""}).html)
+      const drag = this.createGraphVertex({element: $event,elementId:"",x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+      this.graph.cellLabelChanged(this.changeElement,drag.html, false)
+      this.changeElement.geometry.width = drag.w;
+      this.changeElement.geometry.height = drag.h;
+      this.graph.refresh(this.changeElement)
+      this.changeElement = null;
     }
 
     private createGraphVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{
