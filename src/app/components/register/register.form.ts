@@ -1,7 +1,6 @@
 import { FormGroup, FormControl, AbstractControl, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/user.service';
 import { map } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 export class RegisterForm extends FormGroup {
     constructor(private userService: UserService) {
@@ -15,8 +14,9 @@ export class RegisterForm extends FormGroup {
     }
 
     private validateUserNameNotTaken(control: AbstractControl) {
-        if (control.value.length){
-            return this.userService.checkUserName(control.value).pipe( 
+        console.log(this.confirmPassword.errors)
+        if (control.value.length) {
+            return this.userService.checkUserName(control.value).pipe(
                 map(
                     res => {
                         return res ? { usernameTaken: true } : null;
@@ -28,8 +28,8 @@ export class RegisterForm extends FormGroup {
     }
 
     private validateEmailNameNotTaken(control: AbstractControl) {
-        if (control.value.length){
-            return this.userService.checkEmail(control.value).pipe( 
+        if (control.value.length) {
+            return this.userService.checkEmail(control.value).pipe(
                 map(
                     res => {
                         return !res ? { emailTaken: true } : null;
@@ -40,20 +40,19 @@ export class RegisterForm extends FormGroup {
         return false;
     }
 
-    private validateEmailSyntaxConform(control: AbstractControl) {
-        if (control.value.length){
-            var pattern = /\S+@\S+\.\S+/;
-            return control.value.match(pattern) ? of(true) : of(false)
-        }
-        return false;
+    private checkPasswords(control: AbstractControl) {
+        let pass = control.parent.controls['password'].value;
+        let confirmPass = control.value;
+        return pass === confirmPass ? null : { notSame: true }
     }
 
     private addValidators() {
-          this.userName.setValidators(Validators.required);
-          this.email.setValidators(Validators.required);
-          this.userName.setAsyncValidators([this.validateUserNameNotTaken.bind(this)]);
-          this.email.setAsyncValidators( Validators.composeAsync(
-            [this.validateEmailNameNotTaken.bind(this), this.validateEmailSyntaxConform.bind(this)]));
+        this.userName.setValidators(Validators.required);
+        this.email.setValidators(Validators.compose([Validators.required, Validators.email]));
+        this.password.setValidators(Validators.compose([Validators.required, Validators.minLength(6)]));
+        this.confirmPassword.setValidators(Validators.compose([Validators.required, this.checkPasswords]));
+        this.userName.setAsyncValidators(this.validateUserNameNotTaken.bind(this));
+        this.email.setAsyncValidators(this.validateEmailNameNotTaken.bind(this));
     }
 
     get userName() {
