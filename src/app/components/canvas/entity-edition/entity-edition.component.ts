@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Entity, Attribute } from 'src/app/interfaces/entity.interface';
+import { Entity } from 'src/app/interfaces/entity.interface';
+import { Attribute } from 'src/app/interfaces/attribute.interface';
 import { Type } from 'src/app/interfaces/type.enum';
 
 
@@ -15,7 +16,7 @@ export class EntityEditionComponent implements OnInit {
   types = Object.keys(Type);
 
   @Output()
-  event: EventEmitter<Entity> = new EventEmitter();
+  entityChange: EventEmitter<Entity> = new EventEmitter();
   
 
   constructor() { }
@@ -28,7 +29,7 @@ export class EntityEditionComponent implements OnInit {
   }
 
   validate(){
-    this.event.emit(this.entity);
+    this.entityChange.emit(this.entity);
     console.log(this.entity)
   }
 

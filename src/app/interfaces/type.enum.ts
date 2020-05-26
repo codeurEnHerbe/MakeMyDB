@@ -3,6 +3,7 @@ export enum Type{
     int = "int",
     char = "char",
     varchar = "varchar",
+    text = "text",
     float = "float",
     date = "date"
 }
