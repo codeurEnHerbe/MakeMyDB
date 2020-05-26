@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, SimpleChanges, OnChanges, EventEmitter } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 import { SchemaRestService, SchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
@@ -6,6 +6,7 @@ import { MouseAction } from '../tool-box/tool-box.component';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
 import { Type } from 'src/app/interfaces/type.enum';
 import { Entity } from 'src/app/interfaces/entity.interface';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
     selector: 'app-canvas',
@@ -31,12 +32,15 @@ import { Entity } from 'src/app/interfaces/entity.interface';
 
     selectedElement;
     
-    entitys: Entity[];
+    entitys: Drag[] = [];
 
     entity: Entity;
 
     changeElement: mxgraph.mxCell;
   
+    @Output()
+    change: EventEmitter<{entitys: Drag[], reliations: Drag[]}> = new EventEmitter();
+
     constructor(private schemaRestService:SchemaRestService) { 
     }
     
@@ -60,6 +64,11 @@ import { Entity } from 'src/app/interfaces/entity.interface';
 
         graph.addListener(mxEvent.CELLS_MOVED,(sender, evt)=>{
           graph.cellsOrdered(evt.properties.cells,false)
+          let drag = evt.properties.cells[0]
+          let froundDrag = this.entitys.find(ent => ent.elementId == drag.id)
+          froundDrag.x = drag.geometry.x
+          froundDrag.y = drag.geometry.y
+          this.change.emit({entitys: this.entitys, reliations: []})
         });
 
         //Event Listener
@@ -76,10 +85,8 @@ import { Entity } from 'src/app/interfaces/entity.interface';
                   this.selectedElement = null;
               }
             }else if(this.mouseStat == MouseAction.EDIT){
-              this.changeElement = evt.properties.cell;
-              this.entity
-              //this.entity = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false,foreignAttribute:"chose"},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}]};
-        
+                this.changeElement = evt.properties.cell;
+                this.entity = this.entitys.find(ent => ent.elementId == evt.properties.cell.id).element;
             }
           }
         });
@@ -104,29 +111,16 @@ import { Entity } from 'src/app/interfaces/entity.interface';
         style[mxConstants.STYLE_ENDARROW] = mxConstants.NONE;
         style[mxConstants.STYLE_FONTSIZE] = '10';
         graph.getStylesheet().putDefaultEdgeStyle(style);
-        //graph.getStylesheet().putCellStyle()
-        let defaultVertexStyle = mxStylesheet.prototype.createDefaultVertexStyle();
-        console.log(defaultVertexStyle )
-        var v1 = graph.insertVertex(parent, null, '<img src="https://yamikamisama.fr/dl/portal.gif" width="100px"/><b>BOLD</b>,\n pas bold', 50, 20, 80, 30);
-        var v2 = graph.insertVertex(parent, null, '<div class="drag">  <b class="title">title</b>  <div class="separator" style="display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;"></div>  <div>    <table>      <tr>        <td class="name primary">idElement</td>        <td class="type">serial</td>      </tr>        <tr>          <td class="name">chose</td>          <td class="type">integer</td>        </tr>        <tr>          <td class="name">name</td>          <td class="type">string</td>        </tr>    </table>  </div></div>', 160, 20, 80, 30,"border: 1px solid black;    background-color: rgb(112, 215, 255);");
-        var e1 = graph.insertEdge(parent, null, '', v1, v2);
-        
-        //this.addNewDrag({element: this.entity, elementId: "test"})
         
         let elem = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true}]};
-        this.addNewDrag({element: elem, elementId: "test"})
-        this.entitys.push(elem)
+        let newVertex: any = this.addNewDrag({element: elem, elementId: "test"})
 
-        let defaultEntity =  {name:"test",attributes:[
+        let defaultEntity =  {name:"test2",attributes:[
           {name: "variableTest",type: Type.varchar,isPrimary: false},
           {name: "autre test",type: Type.int,isPrimary: true},
-          {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},
-          {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},
           {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}
         ]};
-
-        this.addNewDrag({element: defaultEntity, elementId: "test"});
-        this.entitys.push(defaultEntity)
+        newVertex = this.addNewDrag({element: defaultEntity, elementId: defaultEntity.name});
       }
 
     ngOnChanges(){
@@ -137,21 +131,35 @@ import { Entity } from 'src/app/interfaces/entity.interface';
     }
 
     private addNewDrag(newEntity: Drag){
-      const vertex = this.createGraphVertex(newEntity);
-      return this.graph.insertVertex(this.parent, "parent" ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)//.setStyle("")
+      const existingEntity = this.entitys.find( entity => entity.element.name == newEntity.element.name );
+      if(!existingEntity){
+        const vertex = this.createGraphVertex(newEntity);
+        this.entitys.push(newEntity)
+        this.change.emit({entitys: this.entitys, reliations: []})
+        return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)//.setStyle("")
+      }
+      return false;
     }
 
     private linkDrag(d1,d2){
       this.graph.insertEdge(this.parent, null, '1:1  -  1:1', d1, d2);
     }
 
-    private updateElement($event){
-      const drag = this.createGraphVertex({element: $event,elementId:"",x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
-      this.graph.cellLabelChanged(this.changeElement,drag.html, false)
-      this.changeElement.geometry.width = drag.w;
-      this.changeElement.geometry.height = drag.h;
-      this.graph.refresh(this.changeElement)
-      this.changeElement = null;
+    private updateEntity($event){
+      const existingEntity = this.entitys.find( entity => entity.element.name == $event.name );
+      if(existingEntity){
+        const drag = this.createGraphVertex({element: $event,elementId:"",x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+        this.graph.cellLabelChanged(this.changeElement,drag.html, false)
+        this.changeElement.geometry.width = drag.w;
+        this.changeElement.geometry.height = drag.h;
+        this.graph.refresh(this.changeElement)
+        this.changeElement = null;
+        this.change.emit({entitys: this.entitys, reliations: []})
+      }
+    }
+
+    private updateRelation($event){
+      
     }
 
     private createGraphVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{
@@ -169,7 +177,7 @@ import { Entity } from 'src/app/interfaces/entity.interface';
         html += `<td><div style="text-align: right;padding-right: 5px;padding-left: 10px;font-size: 15px;font-weight: bold;">${element.type}</div></td></tr>`;
       });
       html += "</table></div>";
-      const newVertexData = {html: html, x:drag.x, y: drag.y, w: length*8+10, h: drag.element.attributes.length*20+30};
+      const newVertexData = {html: html, x:drag.x, y: drag.y, w: length*8+10<110?110:length*8+10, h: drag.element.attributes.length*20+30};
       console.log(newVertexData)
       return newVertexData;
     }

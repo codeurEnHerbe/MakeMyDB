@@ -8,16 +8,26 @@ import { Drag } from 'src/app/interfaces/drag.interface';
 })
 export class DragFormComponent implements OnInit {
 
-  private dragName: string;
-  @Output() list: EventEmitter<Drag> = new EventEmitter<Drag>();
+  
+  @Output()
+  newEntity: EventEmitter<Drag> = new EventEmitter<Drag>();
+  private entityName: string;
+
+  @Output()
+  newRelation: EventEmitter<Drag> = new EventEmitter<Drag>();
+  private relationName: string;
 
   constructor() { }
 
   ngOnInit() {
   }
 
-  public createDrag() {
-    this.list.emit({ elementId: "id-"+this.dragName, label: this.dragName, element: {name:this.dragName, attributes: []} });
+  public createEntity() {
+    this.newEntity.emit({ elementId: "id-"+this.entityName, label: this.entityName, element: {name: this.entityName, attributes: []} });
+  }
+
+  public createRelation() {
+    this.newRelation.emit({ elementId: "id-"+this.relationName, label: this.relationName, element: {name:this.relationName, attributes: [], links:[] } });
   }
 
 }

@@ -10,6 +10,7 @@ import { MouseAction } from '../tool-box/tool-box.component';
 export class EditorComponent implements OnInit {
 
   newEntity;
+  newRelation;
   mouseStat = MouseAction.GRAB;
   
   constructor() { }
@@ -23,8 +24,16 @@ export class EditorComponent implements OnInit {
     console.log("ngInit mouseStat",this.mouseStat)
   }
 
-
-  public createDrag(event){
+  public createEntity(event){
     this.newEntity = event;
   }
+
+  public createRelation(event){
+    this.newRelation = event;
+  }
+
+  canvasUpdate($event){
+    console.log($event)
+  }
+
 }

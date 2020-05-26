@@ -1,10 +1,8 @@
 <div id="chart"></div>
 
-<button (click)="loadAllSchemasByName()">Load Shema</button>
-
 <div *ngFor="let schema of loadedAllSchemasByName">
   <label>{{schema.id}} : {{schema.name}}</label>
 </div>
 <div *ngIf="changeElement">
-  <app-entity-edition [entity]="entity" (event)="updateElement($event)"></app-entity-edition>
+  <app-entity-edition [entity]="entity" (entityChange)="updateEntity($event)"></app-entity-edition>
 </div>
