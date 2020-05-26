@@ -64,6 +64,11 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
         graph.addListener(mxEvent.CELLS_MOVED,(sender, evt)=>{
           graph.cellsOrdered(evt.properties.cells,false)
+          let drag = evt.properties.cells[0]
+          let froundDrag = this.entitys.find(ent => ent.elementId == drag.id)
+          froundDrag.x = drag.geometry.x
+          froundDrag.y = drag.geometry.y
+          this.change.emit({entitys: this.entitys, reliations: []})
         });
 
         //Event Listener
@@ -80,11 +85,8 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
                   this.selectedElement = null;
               }
             }else if(this.mouseStat == MouseAction.EDIT){
-              console.log(evt.properties.cell)
                 this.changeElement = evt.properties.cell;
-                this.entity = this.entitys.find(ent => ent.elementId == this.changeElement.id).element
-                console.log(this.changeElement,this.entity)
-                this.change.emit({entitys: this.entitys, reliations: []})
+                this.entity = this.entitys.find(ent => ent.elementId == evt.properties.cell.id).element;
             }
           }
         });

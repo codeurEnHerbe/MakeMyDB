@@ -32,4 +32,8 @@ export class EditorComponent implements OnInit {
     this.newRelation = event;
   }
 
+  canvasUpdate($event){
+    console.log($event)
+  }
+
 }

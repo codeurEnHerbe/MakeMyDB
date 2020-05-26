@@ -19,7 +19,7 @@ export class UserService {
       "email": inputs.email,
       "username": inputs.userName,
       "password": inputs.password
-    }, {observe : 'response'}).subscribe( res =>{
+    }, {observe : 'response',}).subscribe( res =>{
         if(res.status == 200){
           console.log("Register Success")
           return true;
@@ -39,7 +39,7 @@ export class UserService {
 
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'});
-    let options = { headers: headers };
+    let options = { observable: "headers" , headers: headers };
     
     return this.http.post('/login', {
       "username": username,

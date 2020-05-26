@@ -1,3 +1,3 @@
-<app-canvas [newEntity]="newEntity" [mouseStat]="mouseStat"></app-canvas>
+<app-canvas [newEntity]="newEntity" [mouseStat]="mouseStat" (change)="canvasUpdate($event)"></app-canvas>
 <app-drag-form (newEntity)="createEntity($event)" (newRelation)="createRelation($event)"></app-drag-form>
 <app-tool-box (stat)="setStat($event)"></app-tool-box>
