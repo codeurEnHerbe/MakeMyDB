@@ -26,7 +26,7 @@
     "bootstrap": "^4.4.1",
     "cors": "^2.8.5",
     "d3": "^5.15.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "mxgraph": "^4.1.1",
     "ngx-cookie-service": "^3.0.4",
     "rxjs": "~6.4.0",
