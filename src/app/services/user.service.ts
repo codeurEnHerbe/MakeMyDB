@@ -39,11 +39,15 @@ export class UserService {
 
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'});
-    let options = { headers: headers };
+    let options = { observe: "response" , headers: headers };
     
     return this.http.post('/login', {
       "username": username,
       "password": password
-    }, options);
+    }, { observe: "response" , headers: headers, withCredentials: true});
+  }
+
+  userInfos(){
+    return this.http.get('/users/me');
   }
 }

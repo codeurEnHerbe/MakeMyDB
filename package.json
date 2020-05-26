@@ -28,6 +28,7 @@
     "d3": "^5.15.0",
     "jquery": "^3.4.1",
     "mxgraph": "^4.1.1",
+    "ngx-cookie-service": "^3.0.4",
     "rxjs": "~6.4.0",
     "ts-mxgraph": "^1.0.0",
     "tslib": "^1.10.0",

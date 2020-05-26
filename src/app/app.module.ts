@@ -18,6 +18,7 @@ import { BackendInterceptor } from './utils/backend/http-interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntityEditionComponent } from './components/canvas/entity-edition/entity-edition.component';
 import { LoginComponent } from './components/login/login.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { LoginComponent } from './components/login/login.component';
     ReactiveFormsModule
   ],
   providers: [
+    CookieService,
     SchemaRestService,
     AppComponent,
     { provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true }
