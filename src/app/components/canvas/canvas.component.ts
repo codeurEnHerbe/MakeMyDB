@@ -1,12 +1,10 @@
-import { Component, OnInit, Input, Output, SimpleChanges, OnChanges, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, OnChanges, EventEmitter } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 import { SchemaRestService, SchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
-//import { mxGraphModel, mxGraph, mxCell } from 'mxgraph';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
-import { Type } from 'src/app/interfaces/type.enum';
 import { Entity } from 'src/app/interfaces/entity.interface';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Relation } from 'src/app/interfaces/relation.interface';
 
 @Component({
     selector: 'app-canvas',
@@ -17,8 +15,12 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
     @Input() newEntity: Drag;
     oldNewEntity: Drag;
+    @Input() newRelation: Drag;
+    oldNewRelation: Drag;
   
     @Input() mouseStat;
+
+    @Input() loadedData: {entitys: Drag[], relations: Drag[]};
   
     sourceSelectedNode: string = null;
   
@@ -33,13 +35,15 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
     selectedElement;
     
     entitys: Drag[] = [];
+    editedEntity: Entity;
 
-    entity: Entity;
+    relations: Drag[] = [];
+    editedRelation: Relation;
 
     changeElement: mxgraph.mxCell;
   
     @Output()
-    change: EventEmitter<{entitys: Drag[], reliations: Drag[]}> = new EventEmitter();
+    change: EventEmitter<{entitys: Drag[], relations: Drag[]}> = new EventEmitter();
 
     constructor(private schemaRestService:SchemaRestService) { 
     }
@@ -68,7 +72,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
           let froundDrag = this.entitys.find(ent => ent.elementId == drag.id)
           froundDrag.x = drag.geometry.x
           froundDrag.y = drag.geometry.y
-          this.change.emit({entitys: this.entitys, reliations: []})
+          this.change.emit({entitys: this.entitys, relations: []})
         });
 
         //Event Listener
@@ -86,7 +90,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
               }
             }else if(this.mouseStat == MouseAction.EDIT){
                 this.changeElement = evt.properties.cell;
-                this.entity = this.entitys.find(ent => ent.elementId == evt.properties.cell.id).element;
+                this.editedEntity = this.entitys.find(ent => ent.elementId == evt.properties.cell.id).element;
             }
           }
         });
@@ -112,15 +116,18 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
         style[mxConstants.STYLE_FONTSIZE] = '10';
         graph.getStylesheet().putDefaultEdgeStyle(style);
         
-        let elem = {name:"test",attributes:[{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true}]};
-        let newVertex: any = this.addNewDrag({element: elem, elementId: "test"})
+        //Chargement des données qui
+        if(this.loadedData){
+          //load Entitys
+          this.loadedData.entitys.forEach( savedEntity => {
+            this.addNewDrag(savedEntity);
+          });
 
-        let defaultEntity =  {name:"test2",attributes:[
-          {name: "variableTest",type: Type.varchar,isPrimary: false},
-          {name: "autre test",type: Type.int,isPrimary: true},
-          {name: "variableTest",type: Type.varchar,isPrimary: false},{name: "autre test",type: Type.int,isPrimary: true},{name: "autre test",type: Type.int,isPrimary: true},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false},{name: "variableTest",type: Type.varchar,isPrimary: false}
-        ]};
-        newVertex = this.addNewDrag({element: defaultEntity, elementId: defaultEntity.name});
+          //Load Relations
+          this.loadedData.relations.forEach( savedRelation => {
+            this.addNewDrag(savedRelation);
+          });
+        }
       }
 
     ngOnChanges(){
@@ -128,33 +135,41 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
         this.addNewDrag(this.newEntity);
         this.oldNewEntity = this.newEntity;
       }
+      if(this.newRelation != this.oldNewRelation){
+        this.oldNewRelation = this.newEntity;
+      }
     }
 
-    private addNewDrag(newEntity: Drag){
-      const existingEntity = this.entitys.find( entity => entity.element.name == newEntity.element.name );
-      if(!existingEntity){
-        const vertex = this.createGraphVertex(newEntity);
+    private addNewDrag(newEntity: Drag, type:"Entity"|"Relation" = "Entity"){
+      const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == newEntity.element.name.toLowerCase() );
+      if(existingEntity.length<=1){
+        const vertex = this.createEntityVertex(newEntity);
         this.entitys.push(newEntity)
-        this.change.emit({entitys: this.entitys, reliations: []})
-        return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)//.setStyle("")
+        this.change.emit({entitys: this.entitys, relations: []})
+        if(type == "Entity")
+          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
+        else
+          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "ROUNDED;")
       }
       return false;
     }
 
+    //TEMPS
     private linkDrag(d1,d2){
       this.graph.insertEdge(this.parent, null, '1:1  -  1:1', d1, d2);
     }
 
     private updateEntity($event){
-      const existingEntity = this.entitys.find( entity => entity.element.name == $event.name );
-      if(existingEntity){
-        const drag = this.createGraphVertex({element: $event,elementId:"",x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+      const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+      if(existingEntity.length<=1){
+        const drag = this.createEntityVertex({element: $event,elementId:$event.name,x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
         this.graph.cellLabelChanged(this.changeElement,drag.html, false)
         this.changeElement.geometry.width = drag.w;
         this.changeElement.geometry.height = drag.h;
         this.graph.refresh(this.changeElement)
         this.changeElement = null;
-        this.change.emit({entitys: this.entitys, reliations: []})
+        this.change.emit({entitys: this.entitys, relations: []});
+        this.editedEntity = null;
       }
     }
 
@@ -162,7 +177,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
       
     }
 
-    private createGraphVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{
+    private createEntityVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{
       let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${drag.element.name}</div>`
       html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
       "<table style='margin-top: 5px'>";
@@ -178,7 +193,6 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
       });
       html += "</table></div>";
       const newVertexData = {html: html, x:drag.x, y: drag.y, w: length*8+10<110?110:length*8+10, h: drag.element.attributes.length*20+30};
-      console.log(newVertexData)
       return newVertexData;
     }
 }

@@ -12,16 +12,18 @@ export class EditorComponent implements OnInit {
   newEntity;
   newRelation;
   mouseStat = MouseAction.GRAB;
-  
-  constructor() { }
+  storedGraph: {entitys: Drag[], reliations: Drag[]};
+
+  constructor() {
+    this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
+  }
 
   setStat(e){
     this.mouseStat=e;
-    console.log("mouseStat",this.mouseStat)
   }
 
   ngOnInit() {
-    console.log("ngInit mouseStat",this.mouseStat)
+    
   }
 
   public createEntity(event){
@@ -32,8 +34,9 @@ export class EditorComponent implements OnInit {
     this.newRelation = event;
   }
 
-  canvasUpdate($event){
+  canvasUpdate($event:{entitys: Drag[], relations: Drag[]}){
     console.log($event)
+    localStorage.setItem("savedGraph",JSON.stringify($event));
   }
 
 }
