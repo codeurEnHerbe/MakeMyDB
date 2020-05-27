@@ -16,7 +16,7 @@ export class SchemaRestService {
   constructor(private http:  HttpClient) { }
 
   findAllSchemasByName(name: string): Observable<Array<SchemaDTO>>{
-    return this.http.get(`/api/schema/byName/${name}`)
+    return this.http.get(`/api/schema/byName/${name}`, {withCredentials: true})
     .pipe(map( (response:Array<SchemaDTO>) => response));
   }
 

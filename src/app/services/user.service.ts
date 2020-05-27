@@ -48,6 +48,6 @@ export class UserService {
   }
 
   userInfos(){
-    return this.http.get('/users/me');
+    return this.http.get('/users/me', {withCredentials: true});
   }
 }
