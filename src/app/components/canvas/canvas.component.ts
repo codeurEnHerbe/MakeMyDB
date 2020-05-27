@@ -115,6 +115,7 @@ import { Relation } from 'src/app/interfaces/relation.interface';
         style[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
         style[mxConstants.STYLE_ENDARROW] = mxConstants.NONE;
         style[mxConstants.STYLE_FONTSIZE] = '10';
+        
         graph.getStylesheet().putDefaultEdgeStyle(style);
         
         //Chargement des données
@@ -148,13 +149,15 @@ import { Relation } from 'src/app/interfaces/relation.interface';
       const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == newEntity.element.name.toLowerCase() );
       if(existingEntity.length<=1){
         const vertex = this.createEntityVertex(newEntity);
-        this.change.emit({entitys: this.entitys, relations: []})
+        
         if(type == "Entity"){
           this.entitys.push(newEntity)
+          this.change.emit({entitys: this.entitys, relations: []})
           return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
         }else{
           this.relations.push(newEntity)
-          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=5")
+          this.change.emit({entitys: this.entitys, relations: []})
+          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;")
         }
         
       }
@@ -199,7 +202,6 @@ import { Relation } from 'src/app/interfaces/relation.interface';
       "<table style='padding-top: 5px; width: 100%'>";
       let length = 0;
       drag.element.attributes.forEach( (element,index) => {
-        console.log(index)
         let varLength = element.name.length+element.type.length;
         if(element.foreignAttribute) varLength=varLength+2;
         if(varLength > length) length=varLength ;
