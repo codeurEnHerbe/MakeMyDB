@@ -4,5 +4,5 @@
   <label>{{schema.id}} : {{schema.name}}</label>
 </div>
 <div *ngIf="editedEntity">
-  <app-entity-edition [entity]="editedEntity" (entityChange)="updateEntity($event)"></app-entity-edition>
+  <app-entity-edition [entity]="editedEntity" (onDelete)="deleteEntity($event)" (entityChange)="updateEntity($event)"></app-entity-edition>
 </div>

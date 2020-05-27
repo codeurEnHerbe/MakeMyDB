@@ -70,6 +70,7 @@ import { Relation } from 'src/app/interfaces/relation.interface';
           graph.cellsOrdered(evt.properties.cells,false)
           let drag = evt.properties.cells[0]
           let froundDrag = this.entitys.find(ent => ent.elementId == drag.id)
+          console.log(drag)
           froundDrag.x = drag.geometry.x
           froundDrag.y = drag.geometry.y
           this.change.emit({entitys: this.entitys, relations: []})
@@ -116,8 +117,9 @@ import { Relation } from 'src/app/interfaces/relation.interface';
         style[mxConstants.STYLE_FONTSIZE] = '10';
         graph.getStylesheet().putDefaultEdgeStyle(style);
         
-        //Chargement des données qui
+        //Chargement des données
         if(this.loadedData){
+          console.log(this.loadedData)
           //load Entitys
           this.loadedData.entitys.forEach( savedEntity => {
             this.addNewDrag(savedEntity);
@@ -125,7 +127,7 @@ import { Relation } from 'src/app/interfaces/relation.interface';
 
           //Load Relations
           this.loadedData.relations.forEach( savedRelation => {
-            this.addNewDrag(savedRelation);
+            this.addNewDrag(savedRelation,"Relation");
           });
         }
       }
@@ -136,20 +138,25 @@ import { Relation } from 'src/app/interfaces/relation.interface';
         this.oldNewEntity = this.newEntity;
       }
       if(this.newRelation != this.oldNewRelation){
-        this.oldNewRelation = this.newEntity;
+        this.addNewDrag(this.newRelation,"Relation");
+        this.oldNewRelation = this.newRelation;
       }
     }
 
     private addNewDrag(newEntity: Drag, type:"Entity"|"Relation" = "Entity"){
+      console.log(newEntity)
       const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == newEntity.element.name.toLowerCase() );
       if(existingEntity.length<=1){
         const vertex = this.createEntityVertex(newEntity);
-        this.entitys.push(newEntity)
         this.change.emit({entitys: this.entitys, relations: []})
-        if(type == "Entity")
+        if(type == "Entity"){
+          this.entitys.push(newEntity)
           return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
-        else
-          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "ROUNDED;")
+        }else{
+          this.relations.push(newEntity)
+          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=5")
+        }
+        
       }
       return false;
     }
@@ -177,22 +184,33 @@ import { Relation } from 'src/app/interfaces/relation.interface';
       
     }
 
+    deleteEntity($event: Entity){
+      const existingEntityIndex = this.entitys.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+      this.entitys.splice(existingEntityIndex,1)
+      this.graph.removeCells([this.changeElement]);
+      this.changeElement = null;
+      this.change.emit({entitys: this.entitys, relations: []});
+      this.editedEntity = null;
+    }
+
     private createEntityVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{
       let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${drag.element.name}</div>`
       html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
-      "<table style='margin-top: 5px'>";
+      "<table style='padding-top: 5px; width: 100%'>";
       let length = 0;
-      drag.element.attributes.forEach( element => {
+      drag.element.attributes.forEach( (element,index) => {
+        console.log(index)
         let varLength = element.name.length+element.type.length;
         if(element.foreignAttribute) varLength=varLength+2;
         if(varLength > length) length=varLength ;
-        html += `<tr style="margin: 0px; padding: 0px"><td><div style="text-align: left;padding-left: 5px;font-size: 15px;${element.isPrimary?"text-decoration:underline;":""}">${
+        html += `<tr style="margin: 0px; padding: 0px; background-color: rgba(100,130,185,${index%2?"0.3":"0"})"><td><div style="text-align: left;padding-left: 5px;font-size: 15px;${element.isPrimary?"text-decoration:underline;":""}">${
           (element.foreignAttribute?"<b>#&nbsp</b>":"")+element.name
         }</div></td>`;
         html += `<td><div style="text-align: right;padding-right: 5px;padding-left: 10px;font-size: 15px;font-weight: bold;">${element.type}</div></td></tr>`;
       });
       html += "</table></div>";
-      const newVertexData = {html: html, x:drag.x, y: drag.y, w: length*8+10<110?110:length*8+10, h: drag.element.attributes.length*20+30};
+      if(length<drag.element.name.length) length = drag.element.name.length;
+      const newVertexData = {html: html, x:drag.x, y: drag.y, w: length*9+10<110?110:length*9+10, h: drag.element.attributes.length*20+30};
       return newVertexData;
     }
 }

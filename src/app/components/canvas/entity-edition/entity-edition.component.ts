@@ -17,6 +17,9 @@ export class EntityEditionComponent implements OnInit {
 
   @Output()
   entityChange: EventEmitter<Entity> = new EventEmitter();
+
+  @Output()
+  onDelete: EventEmitter<Entity> = new EventEmitter();
   
 
   constructor() { }
@@ -26,6 +29,10 @@ export class EntityEditionComponent implements OnInit {
     this.types.forEach(element => {
       console.log(element)
     });
+  }
+
+  deleteEntity(){
+    this.onDelete.emit(this.entity)
   }
 
   validate(){

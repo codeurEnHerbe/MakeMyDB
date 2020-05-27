@@ -27,7 +27,7 @@ export class DragFormComponent implements OnInit {
   }
 
   public createRelation() {
-    this.newRelation.emit({ elementId: "id-"+this.relationName, label: this.relationName, element: {name:this.relationName, attributes: [], links:[] } });
+    this.newRelation.emit({ elementId: "id-"+this.relationName, label: this.relationName, element: {name: ""+this.relationName, attributes: [], links:[] } });
   }
 
 }
