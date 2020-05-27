@@ -5,6 +5,7 @@ import { MouseAction } from '../tool-box/tool-box.component';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
 import { Entity } from 'src/app/interfaces/entity.interface';
 import { Relation } from 'src/app/interfaces/relation.interface';
+import { Schema } from 'src/app/interfaces/schema.interface';
 
 @Component({
     selector: 'app-canvas',
@@ -20,7 +21,7 @@ import { Relation } from 'src/app/interfaces/relation.interface';
   
     @Input() mouseStat;
 
-    @Input() loadedData: {entitys: Drag[], relations: Drag[]};
+    @Input() loadedData: Schema;
   
     sourceSelectedNode: string = null;
   
@@ -43,7 +44,7 @@ import { Relation } from 'src/app/interfaces/relation.interface';
     changeElement: mxgraph.mxCell;
   
     @Output()
-    change: EventEmitter<{entitys: Drag[], relations: Drag[]}> = new EventEmitter();
+    change: EventEmitter<Schema> = new EventEmitter();
 
     constructor(private schemaRestService:SchemaRestService) { 
     }

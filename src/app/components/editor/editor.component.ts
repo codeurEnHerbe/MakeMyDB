@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 import { MouseAction } from '../tool-box/tool-box.component';
 
+import { Schema } from '../../interfaces/schema.interface';
+import { SchemaRestService } from 'src/app/services/schema-rest.service';
+
+
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
@@ -12,10 +16,12 @@ export class EditorComponent implements OnInit {
   newEntity;
   newRelation;
   mouseStat = MouseAction.GRAB;
-  storedGraph: {entitys: Drag[], reliations: Drag[]};
+  storedGraph: Schema;
+  currentSchema: Schema;
 
-  constructor() {
+  constructor(private schemaService: SchemaRestService) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
+
   }
 
   setStat(e){
@@ -34,9 +40,13 @@ export class EditorComponent implements OnInit {
     this.newRelation = event;
   }
 
-  canvasUpdate($event:{entitys: Drag[], relations: Drag[]}){
-    console.log($event)
+  canvasUpdate($event:Schema){
+    this.currentSchema = $event;
     localStorage.setItem("savedGraph",JSON.stringify($event));
+  }
+
+  public saveSchema() {
+    this.schemaService.saveSchema(this.currentSchema) 
   }
 
 }
