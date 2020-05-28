@@ -33,7 +33,7 @@ import { Schema } from 'src/app/interfaces/schema.interface';
     graph: mxgraph.mxGraph;
     parent: mxgraph.mxCell;
 
-    selectedElement;
+    selectedElement: {cell:mxgraph.mxCell, cellModel: Drag, type:"Entity"|"Relation"};
     
     entitys: Drag[] = [];
     editedEntity: Entity;
@@ -69,30 +69,52 @@ import { Schema } from 'src/app/interfaces/schema.interface';
 
         graph.addListener(mxEvent.CELLS_MOVED,(sender, evt)=>{
           graph.cellsOrdered(evt.properties.cells,false)
-          let drag = evt.properties.cells[0]
-          let froundDrag = this.entitys.find(ent => ent.elementId == drag.id)
-          console.log(drag)
-          froundDrag.x = drag.geometry.x
-          froundDrag.y = drag.geometry.y
-          this.change.emit({entitys: this.entitys, relations: []})
+          let drag:mxgraph.mxCell = evt.properties.cells[0]
+          console.log("name",drag.getAttribute("name"))
+          let froundEntity = this.entitys.find(ent => ent.elementId == drag.id)
+          let froundRelation = this.relations.find(ent => ent.elementId == drag.id)
+
+          console.log(drag.geometry)
+          if(froundEntity){
+            froundEntity.x = drag.geometry.x
+            froundEntity.y = drag.geometry.y
+          }else if(froundRelation){
+            froundRelation.x = drag.geometry.x
+            froundRelation.y = drag.geometry.y
+          }
+          
+          this.change.emit({entitys: this.entitys, relations: this.relations})
         });
 
         //Event Listener
         graph.addListener("click",(sender, evt)=>{
-          //TODO a réspooudre un jour graph.cellsOrdered([evt.properties.cell],false)
-          if(evt.properties.cell){
+          const cell: mxgraph.mxCell = evt.properties.cell;
+          console.log(cell)
+          if(cell){
             if(this.mouseStat == MouseAction.LINK){
-              
+              let froundEntity: Drag = this.entitys.find(ent => ent.elementId == cell.id)
+              let froundRelation: Drag = this.relations.find(ent => ent.elementId == cell.id)
+
               if(!this.selectedElement){
-                this.selectedElement = evt.properties.cell;
+                if(froundEntity){
+                  this.selectedElement = {cell: cell, cellModel: froundEntity, type:"Entity"};
+                }else{
+                  this.selectedElement = {cell: cell, cellModel: froundRelation, type:"Relation"};
+                }
               }else{
-                let vertex: mxgraph.mxCell  = evt.properties.cell;
-                  this.linkDrag(this.selectedElement,vertex);
+                if( (froundEntity && this.selectedElement.type == "Relation") ||
+                (froundRelation && this.selectedElement.type == "Entity")){  
+                  let vertex: mxgraph.mxCell  = cell;
+                  this.linkDrag(this.selectedElement.cell,vertex,1,1);
                   this.selectedElement = null;
+                }
+                
               }
             }else if(this.mouseStat == MouseAction.EDIT){
-                this.changeElement = evt.properties.cell;
-                this.editedEntity = this.entitys.find(ent => ent.elementId == evt.properties.cell.id).element;
+                this.changeElement = cell;
+                const entity = this.entitys.find(ent => ent.elementId == cell.id);
+                const relation = this.relations.find(ent => ent.elementId == cell.id);
+                this.editedEntity = (entity?entity:relation).element;
             }
           }
         });
@@ -129,9 +151,18 @@ import { Schema } from 'src/app/interfaces/schema.interface';
 
           //Load Relations
           this.loadedData.relations.forEach( savedRelation => {
-            this.addNewDrag(savedRelation,"Relation");
+            const newRelationCell = this.addNewDrag(savedRelation,"Relation");
+            if(newRelationCell){
+              const relation:Relation = savedRelation.element;
+              relation.links.forEach( link =>{
+                const entityCell = this.parent.children.find( cell=> cell.id == link.entityName)
+                this.linkDrag(entityCell,newRelationCell,link.cardinalMin,link.cardinalMax);
+              });
+            }
           });
         }
+
+
       }
 
     ngOnChanges(){
@@ -153,21 +184,32 @@ import { Schema } from 'src/app/interfaces/schema.interface';
         
         if(type == "Entity"){
           this.entitys.push(newEntity)
-          this.change.emit({entitys: this.entitys, relations: []})
-          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
+          this.change.emit({entitys: this.entitys, relations: this.relations})
+          const newVertex = this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
+          return newVertex;
         }else{
           this.relations.push(newEntity)
-          this.change.emit({entitys: this.entitys, relations: []})
-          return this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;")
+          this.change.emit({entitys: this.entitys, relations: this.relations})
+          const newVertex = this.graph.insertVertex(this.parent, newEntity.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;");
+          return newVertex;
         }
         
       }
       return false;
     }
 
-    //TEMPS
-    private linkDrag(d1,d2){
-      this.graph.insertEdge(this.parent, null, '1:1  -  1:1', d1, d2);
+    private linkDrag(d1: mxgraph.mxCell, d2: mxgraph.mxCell, cardinalMin, cardinalMax){
+      const isD1Entity = this.entitys.find( entity => entity.element.name == d1.id );
+
+      if(isD1Entity){
+        const relation = this.relations.find( relation => relation.element.name == d2.id );
+        relation.element.links.push({entityName: d1.id, cardinalMax: "1", cardinalMin: "1"})
+      } else {
+        const relation = this.relations.find( relation => relation.element.name == d1.id );
+        relation.element.links.push({entityName: d2.id, cardinalMax: "1", cardinalMin: "1"})
+      }
+      
+      this.graph.insertEdge(this.parent, null, cardinalMin+":"+cardinalMax, d1, d2);
     }
 
     private updateEntity($event){
@@ -179,7 +221,7 @@ import { Schema } from 'src/app/interfaces/schema.interface';
         this.changeElement.geometry.height = drag.h;
         this.graph.refresh(this.changeElement)
         this.changeElement = null;
-        this.change.emit({entitys: this.entitys, relations: []});
+        this.change.emit({entitys: this.entitys, relations: this.relations});
         this.editedEntity = null;
       }
     }
@@ -193,7 +235,7 @@ import { Schema } from 'src/app/interfaces/schema.interface';
       this.entitys.splice(existingEntityIndex,1)
       this.graph.removeCells([this.changeElement]);
       this.changeElement = null;
-      this.change.emit({entitys: this.entitys, relations: []});
+      this.change.emit({entitys: this.entitys, relations: this.relations});
       this.editedEntity = null;
     }
 
