@@ -25,10 +25,6 @@ export class EntityEditionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.entity)
-    this.types.forEach(element => {
-      console.log(element)
-    });
   }
 
   deleteEntity(){

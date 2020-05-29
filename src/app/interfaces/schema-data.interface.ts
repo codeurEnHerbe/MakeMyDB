@@ -1,6 +1,6 @@
 import { Drag } from "./drag.interface";
 
-export interface Schema {
-    entitys: Drag[]; 
+export interface SchemaData {
+    entitys: Drag[];
     relations: Drag[]
 }

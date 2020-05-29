@@ -1,0 +1,32 @@
+<div style="text-align: center;position: absolute;top: calc(50% - 200px); left: calc(50% - 250px); float: left; width: 500px; height: 400px; background-color: rgba(255, 255, 255, 0.8);border: black 1px solid;">
+    
+    <table style="display: inline-block;">
+        
+        <div style="height: 280px;overflow-y: scroll;">
+            
+            <tr>
+                <td>
+                    Cardinalité minimal
+                </td>
+                <td>
+                    Cardinalité maximal
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <input type="text" [(ngModel)]="link.cardinalMin">
+                </td>
+                <td>
+                    <input type="text" [(ngModel)]="link.cardinalMax">
+                </td>
+            </tr>
+
+        </div>
+    </table>
+    
+    <button (click)="validate()">Valider</button>
+    <button style="margin-left: 20px;font-weight: bold;color: red;" (click)="deleteLink()">Supprimer</button>
+    
+</div>
+
