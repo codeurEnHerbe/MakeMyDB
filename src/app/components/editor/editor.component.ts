@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
 import { MouseAction } from '../tool-box/tool-box.component';
 
-import { Schema } from '../../interfaces/schema.interface';
+import { SchemaData } from '../../interfaces/schema-data.interface';
 import { SchemaRestService } from 'src/app/services/schema-rest.service';
 
 
@@ -16,8 +16,8 @@ export class EditorComponent implements OnInit {
   newEntity;
   newRelation;
   mouseStat = MouseAction.GRAB;
-  storedGraph: Schema;
-  currentSchema: Schema;
+  storedGraph: SchemaData;
+  currentSchema: SchemaData;
 
   constructor(private schemaService: SchemaRestService) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
@@ -40,8 +40,9 @@ export class EditorComponent implements OnInit {
     this.newRelation = event;
   }
 
-  canvasUpdate($event:Schema){
+  canvasUpdate($event: SchemaData){
     this.currentSchema = $event;
+    console.log(JSON.stringify($event))
     localStorage.setItem("savedGraph",JSON.stringify($event));
   }
 

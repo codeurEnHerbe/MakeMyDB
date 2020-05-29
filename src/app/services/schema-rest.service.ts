@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { Schema } from '../interfaces/schema.interface';
+import { SchemaData } from '../interfaces/schema-data.interface';
 
 export interface SchemaDTO {
   id: number;
@@ -25,7 +25,7 @@ export class SchemaRestService {
 
   }
 
-  saveSchema(schema: Schema) {
+  saveSchema(schema: SchemaData) {
     this.http.post(`/api/schema/`, {"name": "test", "schemaData": "{\"entitys\": " + JSON.stringify(schema.entitys) + ", \"relations\" :" + JSON.stringify(schema.relations) + "}"}, {withCredentials: true, observe: 'response'}).subscribe( res =>{
       if(res.status == 200){
         console.log("Register Success")

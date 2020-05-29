@@ -19,6 +19,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EntityEditionComponent } from './components/canvas/entity-edition/entity-edition.component';
 import { LoginComponent } from './components/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
+import { LinkEditionComponent } from './components/canvas/link-edition/link-edition.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { CookieService } from 'ngx-cookie-service';
     IndexComponent,
     RegisterComponent,
     EntityEditionComponent,
-    LoginComponent
+    LoginComponent,
+    LinkEditionComponent
   ],
   imports: [
     BrowserModule,
