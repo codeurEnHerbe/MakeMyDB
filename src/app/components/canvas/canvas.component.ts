@@ -36,7 +36,7 @@ import { Link } from 'src/app/interfaces/link.interface';
 
     selectedElement: {cell:mxgraph.mxCell, cellModel: Drag, type:"Entity"|"Relation"};
 
-    indexIdElements: number;
+    indexIdElements: number = 2;
     
     entitys: Drag[] = [];
     editedEntity: Entity;
@@ -132,10 +132,10 @@ import { Link } from 'src/app/interfaces/link.interface';
                 if(linkRelationTarget){
                   this.editedLink = linkRelationTarget.element.links.find( link => link.id == cell.id )
                   this.editedLinkRelationParent = linkRelationTarget.element;
-                  console.log(linkRelationTarget.elementId)
+                  console.log(linkRelationTarget.elementId, "cell.id", cell.id,linkRelationTarget.element.links)
                 }else if(linkRelationSource){
                   this.editedLinkRelationParent = linkRelationSource.element;
-                  console.log(linkRelationSource.elementId)
+                  console.log(linkRelationSource.elementId, "this.editedLink",this.editedLink)
 
                 //cas edition drag (entity/relation)
                 }else{
@@ -292,6 +292,15 @@ import { Link } from 'src/app/interfaces/link.interface';
 
     private updateRelation($event){
       
+    }
+
+    private updateLink($event: Link){
+      console.log($event)
+      this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
+      this.graph.refresh(this.changeElement)
+      this.change.emit({entitys: this.entitys, relations: this.relations});
+      this.changeElement = null;
+      this.editedLink = null;
     }
 
     deleteEntity($event: Entity){
