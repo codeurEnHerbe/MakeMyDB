@@ -13,22 +13,25 @@ export class LinkEditionComponent implements OnInit {
 
   @Output()
   linkChange: EventEmitter<Link> = new EventEmitter();
-
-  @Output()
-  onDelete: EventEmitter<Link> = new EventEmitter();
   
+  cardinal;
 
   constructor() { }
 
-  ngOnInit() { }
-
-  deleteEntity(){
-    this.onDelete.emit(this.link)
+  ngOnInit() {
+    this.cardinal = this.link.cardinalMin+","+this.link.cardinalMax
   }
 
   validate(){
     this.linkChange.emit(this.link);
-    console.log(this.link)
+    console.log("this.link"+this.link)
+  }
+
+  setCardinal($val){
+    this.cardinal = $val.srcElement.value;
+    const cardial = $val.srcElement.value.split(",");
+    this.link.cardinalMin = cardial[0];
+    this.link.cardinalMax = cardial[1];
   }
 
 }

@@ -30,6 +30,10 @@ export class ToolBoxComponent implements OnInit {
     this.setAction(MouseAction.LINK);
   }
 
+  setActionDelete(){
+    this.setAction(MouseAction.DELETE);
+  }
+
   setAction(action: MouseAction){
     this.stat = action;
     this.eventEmiter.emit(this.stat);

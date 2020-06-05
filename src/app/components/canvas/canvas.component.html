@@ -5,8 +5,8 @@
 </div>
 
 <div *ngIf="editedEntity">
-  <app-entity-edition [entity]="editedEntity" (onDelete)="deleteEntity($event)" (entityChange)="updateEntity($event)"></app-entity-edition>
+  <app-entity-edition [entity]="editedEntity" (entityChange)="updateEntity($event)"></app-entity-edition>
 </div>
 <div *ngIf="editedLink">
-  <app-link-edition [link]="editedLink" (onDelete)="deleteEntity($event)" (linkChange)="updateLink($event)"></app-link-edition>
+  <app-link-edition [link]="editedLink" (linkChange)="updateLink($event)"></app-link-edition>
 </div>

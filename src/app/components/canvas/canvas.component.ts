@@ -145,6 +145,24 @@ import { Link } from 'src/app/interfaces/link.interface';
                 }
             }else if(this.mouseStat == MouseAction.DELETE){
               //TODO
+              this.changeElement = cell;
+                //cas edition lien
+                let linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
+                let linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
+                
+                if(linkRelationTarget){
+                  let linkToDelete  = linkRelationTarget.element.links.find( link => link.id == cell.id )
+                  this.deleteLink(cell,linkToDelete,linkRelationTarget.element)
+                }else if(linkRelationSource){
+                  let linkToDelete = linkRelationSource.element.links.find( link => link.id == cell.id )
+                  this.deleteLink(cell,linkToDelete,linkRelationSource.element)
+                  
+                //cas edition drag (entity/relation)
+                }else{
+                  const entity = this.entitys.find(ent => ent.elementId == cell.id);
+                  const relation = this.relations.find(ent => ent.elementId == cell.id);
+                  this.deleteEntity(cell,(entity?entity:relation).element)
+                }
             }
           }
         });
@@ -303,7 +321,7 @@ import { Link } from 'src/app/interfaces/link.interface';
       this.editedLink = null;
     }
 
-    deleteEntity($event: Entity){
+    private deleteEntity(entityCell, $event: Entity){
       const existingEntityIndex = this.entitys.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
       const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
       if(existingEntityIndex != -1){
@@ -320,10 +338,20 @@ import { Link } from 'src/app/interfaces/link.interface';
         this.relations.splice(existingRelationIndex,1)
         this.editedEntity = null;
       }
-      this.graph.removeCells([this.changeElement]);
+      this.graph.removeCells([entityCell]);
       this.changeElement = null;
       this.change.emit({entitys: this.entitys, relations: this.relations});
       
+    }
+
+    private deleteLink(linkCell, lien: Link, parent: Relation){
+      const index = parent.links.findIndex(link=>link.id == lien.id)
+      if(index){
+        parent.links.splice(index,1)
+        this.graph.removeCells([linkCell]);
+        this.changeElement = null;
+        this.change.emit({entitys: this.entitys, relations: this.relations});
+      }
     }
 
     private createEntityVertex(drag: Drag): {html: string, x: number,y: number,w: number,h: number}{

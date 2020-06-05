@@ -3,5 +3,6 @@
         <img [class.selected]="getStatValue()=='Link'" src="../../../assets/img/link.png" (click)="setActionLink()">
         <img [ngClass]="{ selected : getStatValue()=='Grab'}" src="../../../assets/img/grab.png" (click)="setActionGrab()">
         <img [ngClass]="{ selected : getStatValue()=='Edit'}" src="../../../assets/img/edit.png" (click)="setActionEdit()">
+        <img [ngClass]="{ selected : getStatValue()=='Delete'}" src="../../../assets/img/trash.png" (click)="setActionDelete()">
     </div>
 </div>

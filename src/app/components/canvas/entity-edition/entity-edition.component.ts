@@ -18,17 +18,9 @@ export class EntityEditionComponent implements OnInit {
   @Output()
   entityChange: EventEmitter<Entity> = new EventEmitter();
 
-  @Output()
-  onDelete: EventEmitter<Entity> = new EventEmitter();
-  
-
   constructor() { }
 
   ngOnInit() {
-  }
-
-  deleteEntity(){
-    this.onDelete.emit(this.entity)
   }
 
   validate(){
