@@ -26,7 +26,7 @@ export class SchemaRestService {
   }
 
   saveSchema(schema: SchemaData) {
-    this.http.post(`/api/schema/`, {"name": "test", "schemaData": "{\"entitys\": " + JSON.stringify(schema.entitys) + ", \"relations\" :" + JSON.stringify(schema.relations) + "}"}, {withCredentials: true, observe: 'response'}).subscribe( res =>{
+    this.http.post(`/api/schema/`, {"name": "test", "schemaData": "{\"entities\": " + JSON.stringify(schema.entitys) + ", \"relations\" :" + JSON.stringify(schema.relations) + "}"}, {withCredentials: true, observe: 'response'}).subscribe( res =>{
       if(res.status == 200){
         console.log("Register Success")
         return true;
