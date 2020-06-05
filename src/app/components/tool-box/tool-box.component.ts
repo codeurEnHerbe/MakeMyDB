@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 export enum MouseAction {
-  GRAB = "Grab", EDIT = "Edit", LINK="Link"
+  GRAB = "Grab", EDIT = "Edit", LINK="Link", DELETE="Delete"
 }
 
 @Component({

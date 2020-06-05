@@ -3,6 +3,10 @@
 <div *ngFor="let schema of loadedAllSchemasByName">
   <label>{{schema.id}} : {{schema.name}}</label>
 </div>
+
 <div *ngIf="editedEntity">
   <app-entity-edition [entity]="editedEntity" (onDelete)="deleteEntity($event)" (entityChange)="updateEntity($event)"></app-entity-edition>
+</div>
+<div *ngIf="editedLink">
+  <app-link-edition [link]="editedLink" (onDelete)="deleteEntity($event)" (linkChange)="updateLink($event)"></app-link-edition>
 </div>

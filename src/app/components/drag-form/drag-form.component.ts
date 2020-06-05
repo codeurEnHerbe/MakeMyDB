@@ -23,11 +23,11 @@ export class DragFormComponent implements OnInit {
   }
 
   public createEntity() {
-    this.newEntity.emit({ elementId: this.entityName, label: this.entityName, element: {name: this.entityName, attributes: []} });
+    this.newEntity.emit({ elementId: this.entityName, element: {name: this.entityName, attributes: []} });
   }
 
   public createRelation() {
-    this.newRelation.emit({ elementId: this.relationName, label: this.relationName, element: {name: this.relationName, attributes: [], links:[] } });
+    this.newRelation.emit({ elementId: this.relationName, element: {name: this.relationName, attributes: [], links:[] } });
   }
 
 }
