@@ -1,12 +1,36 @@
 img{
     width: 50px;
-    background-color: white;
+}
+
+.mode {
+    display: block;
+    width: 180px;
     &:hover {
         cursor: pointer;
         background-color: rgb(192, 192, 192);
     }
 }
 
+label {
+    text-align: center;
+}
+
+.infoMode {
+    font-size: 15px;
+    font-weight: 500;
+    
+}
+
 .selected {
     background-color: rgb(116, 116, 116);
+}
+
+#title {
+    border-bottom: 1px solid black;
+    color: white;
+    text-align: center;
+    display: block;
+    padding: 5px;
+    font-weight: bold;
+    background-color: #1A73EB;
 }

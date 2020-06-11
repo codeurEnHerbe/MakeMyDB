@@ -1,8 +1,29 @@
-<div class="container">
+<div style="display: inline-block; border: 1px solid black;">
+    <label id="title">Barre d'outils</label>
     <div class="box">
-        <img [class.selected]="getStatValue()=='Link'" src="../../../assets/img/link.png" (click)="setActionLink()">
-        <img [ngClass]="{ selected : getStatValue()=='Grab'}" src="../../../assets/img/grab.png" (click)="setActionGrab()">
-        <img [ngClass]="{ selected : getStatValue()=='Edit'}" src="../../../assets/img/edit.png" (click)="setActionEdit()">
-        <img [ngClass]="{ selected : getStatValue()=='Delete'}" src="../../../assets/img/trash.png" (click)="setActionDelete()">
+        <div class="mode" (click)="setActionNewEntity()" [class.selected]="getStatValue()=='NewEntity'">
+            <img src="../../../assets/img/newEntity.png">
+            <label class="infoMode">Nouvelle Entitée</label>
+        </div>
+        <div class="mode" (click)="setActionNewRelation()" [class.selected]="getStatValue()=='NewRelation'">
+            <img src="../../../assets/img/newRelation.png">
+            <label class="infoMode">Nouvelle Relation</label>
+        </div>
+        <div class="mode" (click)="setActionLink()" [class.selected]="getStatValue()=='Link'">
+            <img src="../../../assets/img/link.png">
+            <label class="infoMode">Relier</label>
+        </div>
+        <div class="mode" (click)="setActionGrab()" [class.selected]="getStatValue()=='Grab'">
+            <img src="../../../assets/img/grab.png">
+            <label class="infoMode">Déplacer</label>
+        </div>
+        <div class="mode" (click)="setActionEdit()" [class.selected]="getStatValue()=='Edit'">
+            <img src="../../../assets/img/edit.png">
+            <label class="infoMode">Editer</label>
+        </div>
+        <div class="mode" (click)="setActionDelete()" [class.selected]="getStatValue()=='Delete'">
+            <img src="../../../assets/img/trash.png">
+            <label class="infoMode">Supprimer</label>
+        </div>
     </div>
 </div>

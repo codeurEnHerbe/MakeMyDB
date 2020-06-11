@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DragFormComponent } from './components/drag-form/drag-form.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
@@ -25,7 +24,6 @@ import { LinkEditionComponent } from './components/canvas/link-edition/link-edit
   declarations: [
     AppComponent,
     CanvasComponent,
-    DragFormComponent,
     EditorComponent,
     ToolBoxComponent,
     IndexComponent,

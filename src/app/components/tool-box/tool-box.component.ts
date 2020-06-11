@@ -1,7 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 export enum MouseAction {
-  GRAB = "Grab", EDIT = "Edit", LINK="Link", DELETE="Delete"
+  GRAB = "Grab", EDIT = "Edit", LINK="Link", DELETE="Delete",
+  NEWRELATION="NewRelation", NEWENTITY="NewEntity"
 }
 
 @Component({
@@ -32,6 +33,14 @@ export class ToolBoxComponent implements OnInit {
 
   setActionDelete(){
     this.setAction(MouseAction.DELETE);
+  }
+
+  setActionNewEntity(){
+    this.setAction(MouseAction.NEWENTITY);
+  }
+
+  setActionNewRelation(){
+    this.setAction(MouseAction.NEWRELATION);
   }
 
   setAction(action: MouseAction){

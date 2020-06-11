@@ -13,12 +13,7 @@ import { Link } from 'src/app/interfaces/link.interface';
     templateUrl: './canvas.component.html',
     styleUrls: ['./canvas.component.scss']
   })
-  export class CanvasComponent implements OnInit, OnChanges {
-
-    @Input() newEntity: Drag;
-    oldNewEntity: Drag;
-    @Input() newRelation: Drag;
-    oldNewRelation: Drag;
+  export class CanvasComponent implements OnInit {
   
     @Input() mouseStat;
 
@@ -48,6 +43,9 @@ import { Link } from 'src/app/interfaces/link.interface';
     editedLinkRelationParent: Relation;
 
     changeElement: mxgraph.mxCell;
+
+    mouseCoordOrigine: {x: number, y: number};
+    translateCoordOrigine: {x: number, y: number};
   
     @Output()
     change: EventEmitter<SchemaData> = new EventEmitter();
@@ -55,8 +53,22 @@ import { Link } from 'src/app/interfaces/link.interface';
     constructor(private schemaRestService:SchemaRestService) { 
     }
     
+    mouseDown($event){
+      if( this.mouseStat == MouseAction.GRAB ){
+        this.mouseCoordOrigine = {x: $event.offsetX, y:$event.offsetY}
+        this.translateCoordOrigine = {x: this.graph.view.translate.x, y: this.graph.view.translate.y}
+      }
+    }
+
+    mouseMove($event){
+      if( this.mouseStat == MouseAction.GRAB && this.mouseCoordOrigine ){
+        const newCoordX = this.translateCoordOrigine.x + $event.offsetX-this.mouseCoordOrigine.x;
+        const newCoordY = this.translateCoordOrigine.y + $event.offsetY-this.mouseCoordOrigine.y
+        this.graph.view.setTranslate(newCoordX,newCoordY);
+      }
+    }
+
     ngOnInit(){
-        this.oldNewEntity = this.newEntity;
         this.mxGraph = mxgraphFactory({
             mxLoadResources: false,
             mxLoadStylesheets: false,
@@ -103,67 +115,95 @@ import { Link } from 'src/app/interfaces/link.interface';
           const cell: mxgraph.mxCell = evt.properties.cell;
           console.log(cell)
           if(cell){
-            if(this.mouseStat == MouseAction.LINK){
-              let froundEntity: Drag = this.entitys.find(ent => ent.elementId == cell.id)
-              let froundRelation: Drag = this.relations.find(rel => rel.elementId == cell.id)
+            let linkRelationTarget;
+            let linkRelationSource;
 
-              if(!this.selectedElement){
-                if(froundEntity){
-                  this.selectedElement = {cell: cell, cellModel: froundEntity, type:"Entity"};
+            switch(this.mouseStat){
+              case (MouseAction.LINK):
+                let froundEntity: Drag = this.entitys.find(ent => ent.elementId == cell.id)
+                let froundRelation: Drag = this.relations.find(rel => rel.elementId == cell.id)
+
+                if(!this.selectedElement){
+                  if(froundEntity){
+                    this.selectedElement = {cell: cell, cellModel: froundEntity, type:"Entity"};
+                  }else{
+                    this.selectedElement = {cell: cell, cellModel: froundRelation, type:"Relation"};
+                  }
                 }else{
-                  this.selectedElement = {cell: cell, cellModel: froundRelation, type:"Relation"};
+                  if( (froundEntity && this.selectedElement.type == "Relation") ||
+                  (froundRelation && this.selectedElement.type == "Entity")){  
+                    let vertex: mxgraph.mxCell  = cell;
+                    this.linkDrag(this.selectedElement.cell,vertex,1,1,true,this.indexIdElements);
+                    this.indexIdElements++;
+                    this.selectedElement = null;
+                  }
+                  
                 }
-              }else{
-                if( (froundEntity && this.selectedElement.type == "Relation") ||
-                (froundRelation && this.selectedElement.type == "Entity")){  
-                  let vertex: mxgraph.mxCell  = cell;
-                  this.linkDrag(this.selectedElement.cell,vertex,1,1,true,this.indexIdElements);
-                  this.indexIdElements++;
-                  this.selectedElement = null;
-                }
-                
-              }
-            }else if(this.mouseStat == MouseAction.EDIT){
+                break;
+              case(MouseAction.EDIT):
+                  this.changeElement = cell;
+                  //cas edition lien
+                  linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
+                  linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
+
+                  if(linkRelationTarget){
+                    this.editedLink = linkRelationTarget.element.links.find( link => link.id == cell.id )
+                    this.editedLinkRelationParent = linkRelationTarget.element;
+                    console.log(linkRelationTarget.elementId, "cell.id", cell.id,linkRelationTarget.element.links)
+                  }else if(linkRelationSource){
+                    this.editedLink = linkRelationSource.element.links.find( link => link.id == cell.id )
+                    this.editedLinkRelationParent = linkRelationSource.element;
+                    console.log(linkRelationSource.elementId, "this.editedLink",this.editedLink)
+
+                  //cas edition drag (entity/relation)
+                  }else{
+                    const entity = this.entitys.find(ent => ent.elementId == cell.id);
+                    const relation = this.relations.find(ent => ent.elementId == cell.id);
+                    this.editedEntity = (entity?entity:relation).element;
+                  }
+                  break;
+              case(MouseAction.DELETE):
+                //TODO
                 this.changeElement = cell;
-                //cas edition lien
-                let linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
-                let linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
-                
-                if(linkRelationTarget){
-                  this.editedLink = linkRelationTarget.element.links.find( link => link.id == cell.id )
-                  this.editedLinkRelationParent = linkRelationTarget.element;
-                  console.log(linkRelationTarget.elementId, "cell.id", cell.id,linkRelationTarget.element.links)
-                }else if(linkRelationSource){
-                  this.editedLinkRelationParent = linkRelationSource.element;
-                  console.log(linkRelationSource.elementId, "this.editedLink",this.editedLink)
 
-                //cas edition drag (entity/relation)
-                }else{
-                  const entity = this.entitys.find(ent => ent.elementId == cell.id);
-                  const relation = this.relations.find(ent => ent.elementId == cell.id);
-                  this.editedEntity = (entity?entity:relation).element;
-                }
-            }else if(this.mouseStat == MouseAction.DELETE){
-              //TODO
-              this.changeElement = cell;
-                //cas edition lien
-                let linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
-                let linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
-                
+                linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
+                linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
+                console.log(linkRelationTarget,":",linkRelationSource)
                 if(linkRelationTarget){
                   let linkToDelete  = linkRelationTarget.element.links.find( link => link.id == cell.id )
                   this.deleteLink(cell,linkToDelete,linkRelationTarget.element)
+                  
                 }else if(linkRelationSource){
                   let linkToDelete = linkRelationSource.element.links.find( link => link.id == cell.id )
                   this.deleteLink(cell,linkToDelete,linkRelationSource.element)
-                  
-                //cas edition drag (entity/relation)
+                    
+                  //cas edition drag (entity/relation)
                 }else{
                   const entity = this.entitys.find(ent => ent.elementId == cell.id);
                   const relation = this.relations.find(ent => ent.elementId == cell.id);
                   this.deleteEntity(cell,(entity?entity:relation).element)
                 }
+                break;
             }
+          }
+          if(this.mouseStat == MouseAction.NEWENTITY){
+            let newElement: Entity = {name: "Entity "+this.indexIdElements++, attributes: []}
+            this.addNewDrag({
+              x: evt.properties.event.layerX - 60,
+              y: evt.properties.event.layerY - 15,
+              element: newElement,
+              elementId: this.indexIdElements
+            }, "Entity", true);
+          }else if(this.mouseStat == MouseAction.NEWRELATION){
+            let newElement: Relation = {name: "Entity "+this.indexIdElements++, attributes: [], links: []}
+            this.addNewDrag({
+              x: evt.properties.event.layerX - 50,
+              y: evt.properties.event.layerY - 15,
+              element: newElement,
+              elementId: this.indexIdElements
+            }, "Relation", true);
+          }else if( this.mouseStat == MouseAction.GRAB ){
+            this.mouseCoordOrigine = null;
           }
         });
         
@@ -233,19 +273,6 @@ import { Link } from 'src/app/interfaces/link.interface';
         console.log("higher id =",indexFromSave)
         this.indexIdElements = Number.parseInt(indexFromSave);
 
-      }
-
-    ngOnChanges(){
-      if(this.newEntity != this.oldNewEntity){
-        this.newEntity.elementId = this.indexIdElements++;
-        this.addNewDrag(this.newEntity, "Entity", true);
-        this.oldNewEntity = this.newEntity;
-      }
-      if(this.newRelation != this.oldNewRelation){
-        this.newRelation.elementId = this.indexIdElements++;
-        this.addNewDrag(this.newRelation,"Relation", true);
-        this.oldNewRelation = this.newRelation;
-      }
     }
 
     private addNewDrag(newDrag: Drag, type:"Entity"|"Relation", idNew: boolean = false){
@@ -345,12 +372,14 @@ import { Link } from 'src/app/interfaces/link.interface';
     }
 
     private deleteLink(linkCell, lien: Link, parent: Relation){
-      const index = parent.links.findIndex(link=>link.id == lien.id)
-      if(index){
+      const index = parent.links.findIndex(link=> link.id == lien.id )
+      if(index > -1){
         parent.links.splice(index,1)
         this.graph.removeCells([linkCell]);
         this.changeElement = null;
         this.change.emit({entitys: this.entitys, relations: this.relations});
+      }else{
+        console.log("not found :",lien, parent.links,index)
       }
     }
 
