@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { SchemaDataDTO, SchemaDTO } from '../interfaces/schema-data.interface';
 
 
-export interface NamedSchemaDTO{
+export interface NamedSchemaDTO {
   id: number;
   name: string;
 }
@@ -28,7 +28,7 @@ export class SchemaRestService {
   saveSchema(schemaDTO: SchemaDTO) {
     const request: SchemaDTO = { id: 0, name: "test", schemaData: schemaDTO.schemaData };
 
-    this.http.post<SchemaDTO>(`/api/schema/`, request, {withCredentials: true}).subscribe(res => {
+    this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true }).subscribe(res => {
       console.log("Succeded");
       schemaDTO.id = res.id;
     },
@@ -36,5 +36,14 @@ export class SchemaRestService {
         console.log("Failed", error);
       }
     );
+  }
+
+  generateSql(idSchema: number) {
+    this.http.get(`/api/schema/generate?id=` + 1, { withCredentials: true }).subscribe(res => {
+      console.log(res);
+    },
+    error => {
+      console.log("Failed", error);
+    })
   }
 }

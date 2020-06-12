@@ -52,7 +52,7 @@ export class EditorComponent implements OnInit {
   }
 
   public generateSql(){
-    // this.schemaService.generateSql(this.currentSchema);
+     this.schemaService.generateSql(this.currentSchema.id);
   }
 
 }
