@@ -7,6 +7,6 @@ export interface SchemaDTO {
 }
 
 export interface SchemaDataDTO{
-    entitys: Drag[];
+    entities: Drag[];
     relations: Drag[];
 }
