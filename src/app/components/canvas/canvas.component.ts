@@ -227,6 +227,11 @@ import { Link } from 'src/app/interfaces/link.interface';
         style[mxConstants.STYLE_ENDARROW] = mxConstants.NONE;
         style[mxConstants.STYLE_FONTSIZE] = '10';
         style[mxConstants.STYLE_FILLCOLOR] = "#1A73EB";
+        style[mxConstants.HIGHLIGHT_COLOR] = "#1A73EB";
+        style[mxConstants.GUIDE_COLOR] = "#1A73EB";
+        style[mxConstants.CONNECT_TARGET_COLOR] = "#1A73EB";
+        style[mxConstants.STYLE_INDICATOR_STROKECOLOR] = "#1A73EB";
+        
         
         graph.getStylesheet().putDefaultEdgeStyle(style);
         

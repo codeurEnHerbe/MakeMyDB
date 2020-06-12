@@ -1,3 +1,4 @@
+<h3 id="titleSchema">{{currentSchema.name}}</h3>
 <app-tool-box  style="padding-left: 10px; float: left; padding-top: 100px;" (stat)="setStat($event)"></app-tool-box>
 <app-canvas style="padding-left: 10px;" [mouseStat]="mouseStat" [loadedData]="storedGraph" (change)="canvasUpdate($event)"></app-canvas>
 <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
