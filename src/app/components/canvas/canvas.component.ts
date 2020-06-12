@@ -220,12 +220,13 @@ import { Link } from 'src/app/interfaces/link.interface';
         graph.setHtmlLabels(true);
         let style = [];
         style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
-        style[mxConstants.STYLE_STROKECOLOR] = '#6482B9';
+        style[mxConstants.STYLE_STROKECOLOR] = '#1A73EB';
         style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
         style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
         style[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
         style[mxConstants.STYLE_ENDARROW] = mxConstants.NONE;
         style[mxConstants.STYLE_FONTSIZE] = '10';
+        style[mxConstants.STYLE_FILLCOLOR] = "#1A73EB";//sa marche pas
         
         graph.getStylesheet().putDefaultEdgeStyle(style);
         
