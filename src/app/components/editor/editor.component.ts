@@ -31,7 +31,7 @@ export class EditorComponent implements OnInit {
     }
 
   canvasUpdate($event: SchemaDataDTO){
-    this.currentSchema = {id: 0, name: "test", schemaData: $event};
+    this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
 
     console.log(JSON.stringify($event))
     localStorage.setItem("savedGraph",JSON.stringify($event));
