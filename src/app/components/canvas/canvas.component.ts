@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, Output, OnChanges, EventEmitter } from '@angular/core';
 import { Drag } from 'src/app/interfaces/drag.interface';
-import { SchemaRestService, SchemaDTO } from 'src/app/services/schema-rest.service';
+import { SchemaRestService, NamedSchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
 import { Entity } from 'src/app/interfaces/entity.interface';
 import { Relation } from 'src/app/interfaces/relation.interface';
-import { SchemaData } from 'src/app/interfaces/schema-data.interface';
+import { SchemaDataDTO } from 'src/app/interfaces/schema-data.interface';
 import { Link } from 'src/app/interfaces/link.interface';
 
 @Component({
@@ -17,11 +17,11 @@ import { Link } from 'src/app/interfaces/link.interface';
   
     @Input() mouseStat;
 
-    @Input() loadedData: SchemaData;
+    @Input() loadedData: SchemaDataDTO;
   
     sourceSelectedNode: string = null;
   
-    loadedAllSchemasByName: Array<SchemaDTO> = [];
+    loadedAllSchemasByName: Array<NamedSchemaDTO> = [];
   
     canDrag: boolean;
 
@@ -48,7 +48,7 @@ import { Link } from 'src/app/interfaces/link.interface';
     translateCoordOrigine: {x: number, y: number};
   
     @Output()
-    change: EventEmitter<SchemaData> = new EventEmitter();
+    change: EventEmitter<SchemaDataDTO> = new EventEmitter();
 
     constructor(private schemaRestService:SchemaRestService) { 
     }

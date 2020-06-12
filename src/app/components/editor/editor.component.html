@@ -1,3 +1,4 @@
 <app-tool-box  style="padding-left: 10px; float: left; padding-top: 100px;" (stat)="setStat($event)"></app-tool-box>
 <app-canvas style="padding-left: 10px;" [mouseStat]="mouseStat" [loadedData]="storedGraph" (change)="canvasUpdate($event)"></app-canvas>
 <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
+<button class="btn btn-success" (click)="generateSql()">Generate SQL</button>
