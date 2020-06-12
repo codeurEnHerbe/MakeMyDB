@@ -33,7 +33,7 @@ import { Link } from 'src/app/interfaces/link.interface';
 
     indexIdElements: number = 2;
     
-    entitys: Drag[] = [];
+    entities: Drag[] = [];
     editedEntity: Entity;
 
     relations: Drag[] = [];
@@ -89,7 +89,7 @@ import { Link } from 'src/app/interfaces/link.interface';
           graph.cellsOrdered(evt.properties.cells,false)
           let drag:mxgraph.mxCell = evt.properties.cells[0]
           console.log("name",drag.getAttribute("name"))
-          let froundEntity = this.entitys.find(ent => {
+          let froundEntity = this.entities.find(ent => {
             console.log("ent.elementId == drag.id",ent.elementId ,drag.id)
             return ent.elementId == drag.id
           })
@@ -107,7 +107,7 @@ import { Link } from 'src/app/interfaces/link.interface';
             froundRelation.y = drag.geometry.y
           }
           
-          this.change.emit({entitys: this.entitys, relations: this.relations})
+          this.change.emit({entities: this.entities, relations: this.relations})
         });
 
         //Event Listener
@@ -120,7 +120,7 @@ import { Link } from 'src/app/interfaces/link.interface';
 
             switch(this.mouseStat){
               case (MouseAction.LINK):
-                let froundEntity: Drag = this.entitys.find(ent => ent.elementId == cell.id)
+                let froundEntity: Drag = this.entities.find(ent => ent.elementId == cell.id)
                 let froundRelation: Drag = this.relations.find(rel => rel.elementId == cell.id)
 
                 if(!this.selectedElement){
@@ -157,7 +157,7 @@ import { Link } from 'src/app/interfaces/link.interface';
 
                   //cas edition drag (entity/relation)
                   }else{
-                    const entity = this.entitys.find(ent => ent.elementId == cell.id);
+                    const entity = this.entities.find(ent => ent.elementId == cell.id);
                     const relation = this.relations.find(ent => ent.elementId == cell.id);
                     this.editedEntity = (entity?entity:relation).element;
                   }
@@ -179,7 +179,7 @@ import { Link } from 'src/app/interfaces/link.interface';
                     
                   //cas edition drag (entity/relation)
                 }else{
-                  const entity = this.entitys.find(ent => ent.elementId == cell.id);
+                  const entity = this.entities.find(ent => ent.elementId == cell.id);
                   const relation = this.relations.find(ent => ent.elementId == cell.id);
                   this.deleteEntity(cell,(entity?entity:relation).element)
                 }
@@ -220,12 +220,13 @@ import { Link } from 'src/app/interfaces/link.interface';
         graph.setHtmlLabels(true);
         let style = [];
         style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
-        style[mxConstants.STYLE_STROKECOLOR] = '#6482B9';
+        style[mxConstants.STYLE_STROKECOLOR] = '#1A73EB';
         style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
         style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
         style[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
         style[mxConstants.STYLE_ENDARROW] = mxConstants.NONE;
         style[mxConstants.STYLE_FONTSIZE] = '10';
+        style[mxConstants.STYLE_FILLCOLOR] = "#1A73EB";
         
         graph.getStylesheet().putDefaultEdgeStyle(style);
         
@@ -234,8 +235,8 @@ import { Link } from 'src/app/interfaces/link.interface';
         //Chargement des données
         if(this.loadedData){
           console.log(this.loadedData)
-          //load Entitys
-          this.loadedData.entitys.forEach( savedEntity => {
+          //load entities
+          this.loadedData.entities.forEach( savedEntity => {
             let loadedEntityDrag = this.addNewDrag(savedEntity, "Entity");
             console.log("load entity:",loadedEntityDrag)
             if(loadedEntityDrag){
@@ -258,7 +259,7 @@ import { Link } from 'src/app/interfaces/link.interface';
               const relation:Relation = savedRelation.element;
               relation.links.forEach( link =>{
                 const entityCell = this.parent.children.find( cell=>{
-                  let foundEntity = this.entitys.find( ent =>
+                  let foundEntity = this.entities.find( ent =>
                     ent.elementId == cell.id &&
                     ent.element.name == link.entityName
                   );
@@ -277,24 +278,24 @@ import { Link } from 'src/app/interfaces/link.interface';
 
     private addNewDrag(newDrag: Drag, type:"Entity"|"Relation", idNew: boolean = false){
       
-      const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == newDrag.element.name.toLowerCase() );
+      const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == newDrag.element.name.toLowerCase() );
       const existingRelation = this.relations.filter( entity => entity.element.name.toLowerCase() == newDrag.element.name.toLowerCase() );
       console.log("new drag", newDrag)
 
       const vertex = this.createEntityVertex(newDrag);
       
       if(type == "Entity" && existingEntity.length<1){
-        this.entitys.push(newDrag)
+        this.entities.push(newDrag)
         const newVertex = this.graph.insertVertex(this.parent, newDrag.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
         if(idNew) newDrag.elementId = newVertex.id;//mxgraph change les id tout seul :/ ducoup pas le choix
-        this.change.emit({entitys: this.entitys, relations: this.relations})
+        this.change.emit({entities: this.entities, relations: this.relations})
         return newVertex;
 
       }else if( type == "Relation" && existingRelation.length<1 ){
         this.relations.push(newDrag)
         const newVertex = this.graph.insertVertex(this.parent, newDrag.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;");
         if(idNew) newDrag.elementId = newVertex.id;
-        this.change.emit({entitys: this.entitys, relations: this.relations})
+        this.change.emit({entities: this.entities, relations: this.relations})
         return newVertex;
       }
       
@@ -302,26 +303,26 @@ import { Link } from 'src/app/interfaces/link.interface';
     }
 
     private linkDrag(d1: mxgraph.mxCell, d2: mxgraph.mxCell, cardinalMin, cardinalMax, isNew = true, id){
-      const isD1Entity = this.entitys.find( entity => entity.elementId == d1.id );
-      const isD2Entity = this.entitys.find( entity => entity.elementId == d2.id );
+      const isD1Entity = this.entities.find( entity => entity.elementId == d1.id );
+      const isD2Entity = this.entities.find( entity => entity.elementId == d2.id );
 
       if(isD1Entity){
         const relation = this.relations.find( relation => relation.elementId == d2.id );
         const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
         if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD1Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
-        this.change.emit({entitys: this.entitys, relations: this.relations});
+        this.change.emit({entities: this.entities, relations: this.relations});
       } else if(isD2Entity) {
         const relation = this.relations.find( relation => relation.elementId == d1.id );
         const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
         if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD2Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
-        this.change.emit({entitys: this.entitys, relations: this.relations});
+        this.change.emit({entities: this.entities, relations: this.relations});
       }
 
       
     }
 
     private updateEntity($event){
-      const existingEntity = this.entitys.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+      const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
       if(existingEntity.length <= 1){
         if(existingEntity.length > 0 )existingEntity[0].element.name = $event.name;
         const drag = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
@@ -330,7 +331,7 @@ import { Link } from 'src/app/interfaces/link.interface';
         this.changeElement.geometry.height = drag.h;
         this.graph.refresh(this.changeElement)
         this.changeElement = null;
-        this.change.emit({entitys: this.entitys, relations: this.relations});
+        this.change.emit({entities: this.entities, relations: this.relations});
         this.editedEntity = null;
       }
     }
@@ -343,16 +344,16 @@ import { Link } from 'src/app/interfaces/link.interface';
       console.log($event)
       this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
       this.graph.refresh(this.changeElement)
-      this.change.emit({entitys: this.entitys, relations: this.relations});
+      this.change.emit({entities: this.entities, relations: this.relations});
       this.changeElement = null;
       this.editedLink = null;
     }
 
     private deleteEntity(entityCell, $event: Entity){
-      const existingEntityIndex = this.entitys.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+      const existingEntityIndex = this.entities.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
       const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
       if(existingEntityIndex != -1){
-        let deletedElement = this.entitys.splice(existingEntityIndex,1)
+        let deletedElement = this.entities.splice(existingEntityIndex,1)
         if(deletedElement.length > 0){
           this.relations.forEach(rel => {
             console.log(rel.element)
@@ -367,7 +368,7 @@ import { Link } from 'src/app/interfaces/link.interface';
       }
       this.graph.removeCells([entityCell]);
       this.changeElement = null;
-      this.change.emit({entitys: this.entitys, relations: this.relations});
+      this.change.emit({entities: this.entities, relations: this.relations});
       
     }
 
@@ -377,7 +378,7 @@ import { Link } from 'src/app/interfaces/link.interface';
         parent.links.splice(index,1)
         this.graph.removeCells([linkCell]);
         this.changeElement = null;
-        this.change.emit({entitys: this.entitys, relations: this.relations});
+        this.change.emit({entities: this.entities, relations: this.relations});
       }else{
         console.log("not found :",lien, parent.links,index)
       }

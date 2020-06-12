@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Drag } from 'src/app/interfaces/drag.interface';
 import { MouseAction } from '../tool-box/tool-box.component';
 
 import { SchemaDataDTO, SchemaDTO } from '../../interfaces/schema-data.interface';
@@ -13,8 +12,6 @@ import { SchemaRestService } from 'src/app/services/schema-rest.service';
 })
 export class EditorComponent implements OnInit {
 
-  newEntity;
-  newRelation;
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
   currentSchema: SchemaDTO;
@@ -30,14 +27,6 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     
-  }
-
-  public createEntity(event){
-    this.newEntity = event;
-  }
-
-  public createRelation(event){
-    this.newRelation = event;
   }
 
   canvasUpdate($event: SchemaDataDTO){
