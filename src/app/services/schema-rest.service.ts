@@ -27,7 +27,7 @@ export class SchemaRestService {
 
   saveSchema(schemaDTO: SchemaDTO) {
     const request: SchemaDTO = { id: 0, name: "test", schemaData: schemaDTO.schemaData };
-
+    console.log(request)
     this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true }).subscribe(res => {
       console.log("Succeded");
       schemaDTO.id = res.id;
@@ -39,7 +39,8 @@ export class SchemaRestService {
   }
 
   generateSql(idSchema: number) {
-    this.http.get(`/api/schema/generate?id=` + 1, { withCredentials: true }).subscribe(res => {
+    let options = { withCredentials: true };
+    this.http.get<String>(`/api/schema/generate?id=` + 1, options).subscribe(res => {
       console.log(res);
     },
     error => {
