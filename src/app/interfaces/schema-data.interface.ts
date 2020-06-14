@@ -11,13 +11,13 @@ export interface SchemaDataDTO{
     relations: Drag[];
 }
 
-export interface schemaDTOResponse {
+export interface SchemaDTOResponse {
     id?: number;
     name?: string;
     schemaData: string;
 }
 
-export interface schemaDTOResponseLight {
+export interface SchemaDTOResponseLight {
     id?: number;
     name?: string;
 }

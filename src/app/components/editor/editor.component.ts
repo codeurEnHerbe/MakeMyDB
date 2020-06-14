@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { MouseAction } from '../tool-box/tool-box.component';
 
-import { SchemaDataDTO, SchemaDTO, schemaDTOResponse, schemaDTOResponseLight } from '../../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, SchemaDTOResponse, SchemaDTOResponseLight } from '../../interfaces/schema-data.interface';
 import { SchemaRestService } from 'src/app/services/schema-rest.service';
+import { switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -15,9 +16,11 @@ export class EditorComponent implements OnInit {
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
   currentSchema: SchemaDTO;
-  currentUserSchemas: Array<schemaDTOResponseLight>;
+  currentUserSchemas: Array<SchemaDTOResponseLight>;
 
-  constructor(private schemaService: SchemaRestService) {
+  constructor(private schemaService: SchemaRestService,
+    private cdRef: ChangeDetectorRef,
+    private zone:NgZone) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
 
   }
@@ -28,7 +31,7 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     this.loadAllSchemas();
-    }
+  }
 
   canvasUpdate($event: SchemaDataDTO){
     this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
@@ -38,11 +41,27 @@ export class EditorComponent implements OnInit {
   }
 
   public saveSchema() {
-    this.schemaService.saveSchema(this.currentSchema) 
+    this.schemaService.saveSchema(this.currentSchema).pipe(
+      switchMap( data => {
+        this.currentSchema.id = data.id;
+
+        return this.schemaService.loadAllSchemas();
+      })
+    ).subscribe(
+      result => {
+        this.currentUserSchemas = result;
+      }
+    );
+    this.cdRef.detectChanges();
   }
 
   public generateSql(){
-     this.schemaService.generateSql(this.currentSchema.id);
+     this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
+      console.log(res);
+    },
+    error => {
+      console.log("Failed", error);
+    });
   }
 
   private loadAllSchemas() {
@@ -54,8 +73,15 @@ export class EditorComponent implements OnInit {
     });
   }
 
-  private setStoreGraph(schema) {
-    console.log(schema);
+  private setStoreGraph(schema: SchemaDTOResponseLight) {
+    this.schemaService.loadSchema(schema.id).subscribe(res => {
+      this.currentSchema = {
+        id: res.id,
+        name: res.name,
+        schemaData: JSON.parse(res.schemaData)
+      };
+      console.log(this.currentSchema)
+    });
   }
 
 }

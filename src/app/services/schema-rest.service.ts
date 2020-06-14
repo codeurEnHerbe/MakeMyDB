@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { SchemaDataDTO, SchemaDTO, schemaDTOResponse, schemaDTOResponseLight } from '../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, SchemaDTOResponse, SchemaDTOResponseLight } from '../interfaces/schema-data.interface';
 
 
 export interface NamedSchemaDTO {
@@ -16,33 +16,21 @@ export class SchemaRestService {
 
   constructor(private http: HttpClient) { }
 
-  loadAllSchemas(): Observable<Array<schemaDTOResponseLight>> {
-    return this.http.get<Array<schemaDTOResponseLight>>('/api/schema/load/', { withCredentials: true })
+  loadAllSchemas(): Observable<Array<SchemaDTOResponseLight>> {
+    return this.http.get<Array<SchemaDTOResponseLight>>('/api/schema/load/', { withCredentials: true })
   }
 
-  getSchemaDTOs() {
-
+  public loadSchema(id: number): Observable<SchemaDTOResponse>{
+    return this.http.get<SchemaDTOResponse>(`/api/schema/load/` + id, {withCredentials: true});
   }
 
-  saveSchema(schemaDTO: SchemaDTO) {
-    const request: SchemaDTO = { id: 0, name: "test", schemaData: schemaDTO.schemaData };
-    this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true }).subscribe(res => {
-      console.log("Succeded");
-      schemaDTO.id = res.id;
-    },
-      error => {
-        console.log("Failed", error);
-      }
-    );
+  saveSchema(schemaDTO: SchemaDTO): Observable<any> {
+    const request: SchemaDTO = { id: 0, name: schemaDTO.name, schemaData: schemaDTO.schemaData };
+    return this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true });
   }
 
-  generateSql(idSchema: number) {
+  generateSql(idSchema: number): Observable<any> {
     let options = { withCredentials: true };
-    this.http.get<String>(`/api/schema/generate?id=` + 1, options).subscribe(res => {
-      console.log(res);
-    },
-    error => {
-      console.log("Failed", error);
-    })
+    return this.http.get<String>(`/api/schema/generate?id=` + 1, options)
   }
 }
