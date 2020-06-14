@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MouseAction } from '../tool-box/tool-box.component';
 
-import { SchemaDataDTO, SchemaDTO } from '../../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, schemaDTOResponse, schemaDTOResponseLight } from '../../interfaces/schema-data.interface';
 import { SchemaRestService } from 'src/app/services/schema-rest.service';
 
 
@@ -15,6 +15,7 @@ export class EditorComponent implements OnInit {
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
   currentSchema: SchemaDTO;
+  currentUserSchemas: Array<schemaDTOResponseLight>;
 
   constructor(private schemaService: SchemaRestService) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
@@ -26,11 +27,11 @@ export class EditorComponent implements OnInit {
   }
 
   ngOnInit() {
-    
-  }
+    this.loadAllSchemas();
+    }
 
   canvasUpdate($event: SchemaDataDTO){
-    this.currentSchema = {id: 0, name: "test", schemaData: $event};
+    this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
 
     console.log(JSON.stringify($event))
     localStorage.setItem("savedGraph",JSON.stringify($event));
@@ -42,6 +43,19 @@ export class EditorComponent implements OnInit {
 
   public generateSql(){
      this.schemaService.generateSql(this.currentSchema.id);
+  }
+
+  private loadAllSchemas() {
+    this.schemaService.loadAllSchemas()
+    .subscribe(res => {
+      this.currentUserSchemas = res;
+    }, error => {
+      console.log("Failed", error);
+    });
+  }
+
+  private setStoreGraph(schema) {
+    console.log(schema);
   }
 
 }

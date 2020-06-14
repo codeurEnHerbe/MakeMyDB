@@ -1,0 +1,14 @@
+.canvas-list {
+    display: flex;
+
+    .center-list {
+        width: 100%;
+        height: 100%;
+
+        .list-schema {
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 10px;
+        }
+    }
+}

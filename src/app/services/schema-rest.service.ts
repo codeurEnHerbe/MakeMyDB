@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { SchemaDataDTO, SchemaDTO } from '../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, schemaDTOResponse, schemaDTOResponseLight } from '../interfaces/schema-data.interface';
 
 
 export interface NamedSchemaDTO {
@@ -16,9 +16,8 @@ export class SchemaRestService {
 
   constructor(private http: HttpClient) { }
 
-  findAllSchemasByName(name: string): Observable<Array<SchemaDTO>> {
-    return this.http.get(`/api/schema/byName/${name}`, { withCredentials: true })
-      .pipe(map((response: Array<SchemaDTO>) => response));
+  loadAllSchemas(): Observable<Array<schemaDTOResponseLight>> {
+    return this.http.get<Array<schemaDTOResponseLight>>('/api/schema/load/', { withCredentials: true })
   }
 
   getSchemaDTOs() {
@@ -27,7 +26,6 @@ export class SchemaRestService {
 
   saveSchema(schemaDTO: SchemaDTO) {
     const request: SchemaDTO = { id: 0, name: "test", schemaData: schemaDTO.schemaData };
-    console.log(request)
     this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true }).subscribe(res => {
       console.log("Succeded");
       schemaDTO.id = res.id;
