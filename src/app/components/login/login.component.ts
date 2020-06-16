@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { CookieService } from 'ngx-cookie-service';
+import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +23,10 @@ export class LoginComponent  {
   login(){
     if(this.username && this.password){
       this.userService.login(this.username, this.password).subscribe(
-        (res) => console.log(console.log(res))
+        (res) => {
+          console.log(console.log(res));
+          this.userService.isUserConnected.next(true);
+        }
       );
     }else{
       this.loginStatus = "Please fill the missing fields"

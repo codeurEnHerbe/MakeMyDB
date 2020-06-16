@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'MakeMyDB';
+
+  public showLogin: boolean = true;
+
+  constructor(
+    public userService: UserService
+    ) {
+      this.userService.getIsUserConnected().subscribe( isUserConnected => this.showLogin = !isUserConnected)
+     }
 }

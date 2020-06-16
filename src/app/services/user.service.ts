@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-
+  public isUserConnected: Subject<boolean> = new Subject<boolean>(); 
   constructor(private http: HttpClient) {
+    this.isUserConnected.next(false);
   }
 
   checkEmail(email: string) {
@@ -49,5 +50,9 @@ export class UserService {
 
   userInfos(){
     return this.http.get('/users/me', {withCredentials: true});
+  }
+
+  public getIsUserConnected(): Observable<boolean>{
+    return this.isUserConnected.asObservable();
   }
 }
