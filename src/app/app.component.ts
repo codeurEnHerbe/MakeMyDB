@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { UserService } from './services/user.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-root',
@@ -12,8 +13,15 @@ export class AppComponent {
   public showLogin: boolean = true;
 
   constructor(
-    public userService: UserService
-    ) {
-      this.userService.getIsUserConnected().subscribe( isUserConnected => this.showLogin = !isUserConnected)
-     }
+    public userService: UserService,
+    public cookieService: CookieService
+  ) {
+    this.showLogin = sessionStorage.getItem("isUserConnected") == 'false' || !sessionStorage.getItem("isUserConnected");
+    this.userService.getIsUserConnected().subscribe(isUserConnected => { this.showLogin = !isUserConnected; })
+    console.log(this.showLogin)
+  }
+
+  deleteCookie() {
+    this.userService.logout();
+  }
 }

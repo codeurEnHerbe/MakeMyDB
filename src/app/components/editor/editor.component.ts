@@ -68,8 +68,6 @@ export class EditorComponent implements OnInit {
     this.schemaService.loadAllSchemas()
     .subscribe(res => {
       this.currentUserSchemas = res;
-    }, error => {
-      console.log("Failed", error);
     });
   }
 

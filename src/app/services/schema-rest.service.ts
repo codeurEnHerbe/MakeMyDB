@@ -17,16 +17,16 @@ export class SchemaRestService {
   constructor(private http: HttpClient) { }
 
   loadAllSchemas(): Observable<Array<SchemaDTOResponseLight>> {
-    return this.http.get<Array<SchemaDTOResponseLight>>('/api/schema/load/', { withCredentials: true })
+    return this.http.get<Array<SchemaDTOResponseLight>>('/api/schema/load/')
   }
 
   public loadSchema(id: number): Observable<SchemaDTOResponse>{
-    return this.http.get<SchemaDTOResponse>(`/api/schema/load/` + id, {withCredentials: true});
+    return this.http.get<SchemaDTOResponse>(`/api/schema/load/` + id);
   }
 
   saveSchema(schemaDTO: SchemaDTO): Observable<any> {
     const request: SchemaDTO = { id: 0, name: schemaDTO.name, schemaData: schemaDTO.schemaData };
-    return this.http.post<SchemaDTO>(`/api/schema/`, request, { withCredentials: true });
+    return this.http.post<SchemaDTO>(`/api/schema/`, request);
   }
 
   generateSql(idSchema: number): Observable<any> {

@@ -26,6 +26,10 @@ export class LoginComponent  {
         (res) => {
           console.log(console.log(res));
           this.userService.isUserConnected.next(true);
+          sessionStorage.setItem("isUserConnected", "true");
+          // this.router.navigate(['editor'])
+        },(error) => {
+          this.loginStatus = "Wrong username or password"
         }
       );
     }else{
