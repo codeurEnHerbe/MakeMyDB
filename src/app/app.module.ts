@@ -13,7 +13,7 @@ import { SchemaRestService } from './services/schema-rest.service';
 import { ToolBoxComponent } from './components/tool-box/tool-box.component';
 import { IndexComponent } from './components/index/index.component';
 import { RegisterComponent } from './components/register/register.component';
-import { BackendInterceptor, BackendInterceptorLogin } from './utils/backend/http-interceptor';
+import { BackendInterceptor } from './utils/backend/http-interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntityEditionComponent } from './components/canvas/entity-edition/entity-edition.component';
 import { LoginComponent } from './components/login/login.component';

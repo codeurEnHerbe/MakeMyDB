@@ -3,6 +3,7 @@ import { UserService } from 'src/app/services/user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,8 @@ export class LoginComponent  {
 
   constructor(
     private userService: UserService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private router: Router
     ) { }
 
   login(){
@@ -27,7 +29,7 @@ export class LoginComponent  {
           console.log(console.log(res));
           this.userService.isUserConnected.next(true);
           sessionStorage.setItem("isUserConnected", "true");
-          // this.router.navigate(['editor'])
+          this.router.navigate(['editor'])
         },(error) => {
           this.loginStatus = "Wrong username or password"
         }
