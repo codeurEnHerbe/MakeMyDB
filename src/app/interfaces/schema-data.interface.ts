@@ -1,4 +1,4 @@
-import { Drag } from "./drag.interface";
+import { Dragable } from "./dragable.interface";
 
 export interface SchemaDTO {
     id?: number;
@@ -7,8 +7,8 @@ export interface SchemaDTO {
 }
 
 export interface SchemaDataDTO{
-    entities: Drag[];
-    relations: Drag[];
+    entities: Dragable[];
+    relations: Dragable[];
 }
 
 export interface SchemaDTOResponse {

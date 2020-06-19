@@ -25,6 +25,7 @@ export class SchemaRestService {
   }
 
   saveSchema(schemaDTO: SchemaDTO): Observable<SchemaDTO> {
+    console.log("saveSchema",schemaDTO)
     const request: SchemaDTO = { id: 0, name: schemaDTO.name, schemaData: schemaDTO.schemaData };
     return this.http.post<SchemaDTO>(`/api/schema/`, request);
   }

@@ -1,5 +1,5 @@
 
-export interface Drag{
+export interface Dragable{
     elementId: any;
     x?: number;
     y?: number;
