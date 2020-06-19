@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { SchemaDataDTO, SchemaDTO, SchemaDTOResponse, SchemaDTOResponseLight } from '../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, SchemaDTOResponseLight, SchemaDTOResponse, } from '../interfaces/schema-data.interface';
 
 
 export interface NamedSchemaDTO {
@@ -24,13 +24,12 @@ export class SchemaRestService {
     return this.http.get<SchemaDTOResponse>(`/api/schema/load/` + id);
   }
 
-  saveSchema(schemaDTO: SchemaDTO): Observable<any> {
+  saveSchema(schemaDTO: SchemaDTO): Observable<SchemaDTO> {
     const request: SchemaDTO = { id: 0, name: schemaDTO.name, schemaData: schemaDTO.schemaData };
     return this.http.post<SchemaDTO>(`/api/schema/`, request);
   }
 
-  generateSql(idSchema: number): Observable<any> {
-    let options = { withCredentials: true };
-    return this.http.get<String>(`/api/schema/generate?id=` + 1, options)
+  generateSql(idSchema: number): Observable<string> {
+    return this.http.get<string>(`/api/schema/generate?id=` + idSchema)
   }
 }

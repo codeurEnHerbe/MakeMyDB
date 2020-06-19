@@ -71,14 +71,15 @@ export class EditorComponent implements OnInit {
     });
   }
 
-  private setStoreGraph(schema: SchemaDTOResponseLight) {
+  private getStoreGraph(schema: SchemaDTOResponseLight) {
     this.schemaService.loadSchema(schema.id).subscribe(res => {
       this.currentSchema = {
         id: res.id,
         name: res.name,
         schemaData: JSON.parse(res.schemaData)
       };
-      console.log(this.currentSchema)
+      this.storedGraph = this.currentSchema.schemaData;
+      console.log("Get Storad Graph",this.currentSchema)
     });
   }
 

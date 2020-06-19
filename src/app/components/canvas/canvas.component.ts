@@ -13,45 +13,55 @@ import { Link } from 'src/app/interfaces/link.interface';
     templateUrl: './canvas.component.html',
     styleUrls: ['./canvas.component.scss']
   })
-  export class CanvasComponent implements OnInit {
+export class CanvasComponent implements OnInit, OnChanges {
   
-    @Input() mouseStat;
+  @Input() mouseStat;
 
-    @Input() loadedData: SchemaDataDTO;
+  @Input() loadedData: SchemaDataDTO;
   
-    sourceSelectedNode: string = null;
+  sourceSelectedNode: string = null;
   
-    loadedAllSchemasByName: Array<NamedSchemaDTO> = [];
+  loadedAllSchemasByName: Array<NamedSchemaDTO> = [];
   
-    canDrag: boolean;
+  canDrag: boolean;
 
-    mxGraph: typeof mxgraph;
-    graph: mxgraph.mxGraph;
-    parent: mxgraph.mxCell;
+  mxGraph: typeof mxgraph;
+  graph: mxgraph.mxGraph;
+  parent: mxgraph.mxCell;
 
-    selectedElement: {cell:mxgraph.mxCell, cellModel: Drag, type:"Entity"|"Relation"};
+  selectedElement: {cell:mxgraph.mxCell, cellModel: Drag, type:"Entity"|"Relation"};
 
-    indexIdElements: number = 2;
-    
-    entities: Drag[] = [];
-    editedEntity: Entity;
-
-    relations: Drag[] = [];
-    editedRelation: Relation;
-
-    editedLink: Link;
-    editedLinkRelationParent: Relation;
-
-    changeElement: mxgraph.mxCell;
-
-    mouseCoordOrigine: {x: number, y: number};
-    translateCoordOrigine: {x: number, y: number};
+  indexIdElements: number = 2;
   
-    @Output()
-    change: EventEmitter<SchemaDataDTO> = new EventEmitter();
+  entities: Drag[] = [];
+  editedEntity: Entity;
 
-    constructor(private schemaRestService:SchemaRestService) { 
+  relations: Drag[] = [];
+  editedRelation: Relation;
+
+  editedLink: Link;
+  editedLinkRelationParent: Relation;
+
+  changeElement: mxgraph.mxCell;
+
+  mouseCoordOrigine: {x: number, y: number};
+  translateCoordOrigine: {x: number, y: number};
+
+  @Output()
+  change: EventEmitter<SchemaDataDTO> = new EventEmitter();
+
+  constructor(private schemaRestService:SchemaRestService) { 
+  }
+
+  ngOnChanges(changes: any): void {
+    if(this.graph && changes.loadedData){
+      console.log("Rechargement du schéma")
+      this.graph.destroy()
+      this.entities = [];
+      this.relations = [];
+      this.ngOnInit()
     }
+  }
     
     mouseDown($event){
       if( this.mouseStat == MouseAction.GRAB ){
