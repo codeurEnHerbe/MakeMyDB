@@ -4,6 +4,7 @@ import { MouseAction } from '../tool-box/tool-box.component';
 import { SchemaDataDTO, SchemaDTO, SchemaDTOResponse, SchemaDTOResponseLight } from '../../interfaces/schema-data.interface';
 import { SchemaRestService } from 'src/app/services/schema-rest.service';
 import { switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -17,6 +18,7 @@ export class EditorComponent implements OnInit {
   storedGraph: SchemaDataDTO;
   currentSchema: SchemaDTO;
   currentUserSchemas: Array<SchemaDTOResponseLight>;
+  sqlData: string;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
@@ -52,12 +54,12 @@ export class EditorComponent implements OnInit {
         this.currentUserSchemas = result;
       }
     );
-    this.cdRef.detectChanges();
   }
 
   public generateSql(){
      this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
       console.log(res);
+      this.sqlData = res;
     },
     error => {
       console.log("Failed", error);

@@ -29,7 +29,13 @@ export class SchemaRestService {
     return this.http.post<SchemaDTO>(`/api/schema/`, request);
   }
 
+<<<<<<< HEAD
   generateSql(idSchema: number): Observable<string> {
     return this.http.get<string>(`/api/schema/generate?id=` + idSchema)
+=======
+  generateSql(idSchema: number): Observable<any> {
+    let options = { withCredentials: true };
+    return this.http.get<String>(`/api/schema/generate?id=` + idSchema, options)
+>>>>>>> 082f662b69b0961f21be75a199bea2ed070e1aa8
   }
 }

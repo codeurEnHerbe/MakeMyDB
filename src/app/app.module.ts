@@ -19,6 +19,7 @@ import { EntityEditionComponent } from './components/canvas/entity-edition/entit
 import { LoginComponent } from './components/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
 import { LinkEditionComponent } from './components/canvas/link-edition/link-edition.component';
+import { ShowSqlComponent } from './components/show-sql/show-sql.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { LinkEditionComponent } from './components/canvas/link-edition/link-edit
     RegisterComponent,
     EntityEditionComponent,
     LoginComponent,
-    LinkEditionComponent
+    LinkEditionComponent,
+    ShowSqlComponent
   ],
   imports: [
     BrowserModule,
