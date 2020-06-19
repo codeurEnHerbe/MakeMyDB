@@ -31,6 +31,6 @@ export class SchemaRestService {
 
   generateSql(idSchema: number): Observable<any> {
     let options = { withCredentials: true };
-    return this.http.get<String>(`/api/schema/generate?id=` + 1, options)
+    return this.http.get<String>(`/api/schema/generate?id=` + idSchema, options)
   }
 }
