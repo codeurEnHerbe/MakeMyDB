@@ -1,6 +1,11 @@
+.toolbox{
+    height: 450px;
+    padding-left: 10px; 
+    float: left; 
+    padding-top: 100px;
+}
 .canvas-list {
     display: flex;
-
     .center-list {
         margin-top: 10px;
         width: 100%;
@@ -17,20 +22,29 @@
             margin: 0 auto;
             margin-top: 10px;
 
-            .sqlAndClose {
+                
+        .sqlAndClose {
+            height: 100%;
+
+                
+            .sqlData {
+                width: 90%;
                 height: 100%;
+                margin: 0 auto;
+                display: block;
+            }
 
-                .sqlData {
-                    width: 90%;
-                    height: 100%;
-                    margin: 0 auto;
-                    display: block;
-                }
-
-                .close:hover {
-                    cursor: pointer;
+            .close:hover {
+                cursor: pointer;
                 }
             }
         }
+    }
+}
+.bottom-flex{
+    display: flex;
+    margin-left: 200px;
+    .right-bottom{
+        margin-left: 968px;
     }
 }
