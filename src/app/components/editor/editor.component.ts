@@ -99,5 +99,4 @@ export class EditorComponent implements OnInit {
   enableShowSchemaList(){
     this.showSchemaList = true;
   }
-
 }
