@@ -19,34 +19,37 @@ export class EditorComponent implements OnInit {
   currentSchema: SchemaDTO;
   currentUserSchemas: Array<SchemaDTOResponseLight>;
   sqlData: string;
+  showSchemaList: boolean = true;
+  schemaNotSavedError: boolean = false;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
-    private zone:NgZone) {
+    private zone: NgZone) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
 
   }
 
-  setStat(e){
-    this.mouseStat=e;
+  setStat(e) {
+    this.mouseStat = e;
   }
 
   ngOnInit() {
     this.loadAllSchemas();
   }
 
-  canvasUpdate($event: SchemaDataDTO){
-    this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
+  canvasUpdate($event: SchemaDataDTO) {
+    this.currentSchema = { name: "Nouveau MCD", schemaData: $event };
 
     console.log(JSON.stringify($event))
-    localStorage.setItem("savedGraph",JSON.stringify($event));
+    localStorage.setItem("savedGraph", JSON.stringify($event));
   }
 
   public saveSchema() {
+    this.schemaNotSavedError = false;
     this.schemaService.saveSchema(this.currentSchema).pipe(
-      switchMap( data => {
+      switchMap(data => {
         this.currentSchema.id = data.id;
-
+        console.log(data.id)
         return this.schemaService.loadAllSchemas();
       })
     ).subscribe(
@@ -56,21 +59,23 @@ export class EditorComponent implements OnInit {
     );
   }
 
-  public generateSql(){
-     this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
-      console.log(res);
-      this.sqlData = res;
+  public generateSql() {
+    this.showSchemaList = false;
+    this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
+      this.sqlData = res.body;
     },
-    error => {
-      console.log("Failed", error);
-    });
+      error => {
+        if (error.status == 400) {
+          this.schemaNotSavedError = true;
+        }
+      });
   }
 
   private loadAllSchemas() {
     this.schemaService.loadAllSchemas()
-    .subscribe(res => {
-      this.currentUserSchemas = res;
-    });
+      .subscribe(res => {
+        this.currentUserSchemas = res;
+      });
   }
 
   private getStoreGraph(schema: SchemaDTOResponseLight) {
@@ -81,8 +86,12 @@ export class EditorComponent implements OnInit {
         schemaData: JSON.parse(res.schemaData)
       };
       this.storedGraph = this.currentSchema.schemaData;
-      console.log("Get Storad Graph",this.currentSchema)
+      console.log("Get Storad Graph", this.currentSchema)
     });
+  }
+
+  enableShowSchemaList(){
+    this.showSchemaList = true;
   }
 
 }
