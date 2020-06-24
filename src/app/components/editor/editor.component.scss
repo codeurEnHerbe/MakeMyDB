@@ -1,14 +1,58 @@
+.toolbox{
+    height: 450px;
+    padding-left: 10px; 
+    float: left; 
+    padding-top: 100px;
+}
 .canvas-list {
     display: flex;
-
+    .canvas {
+        padding-left: 10px;
+        width: calc( 90% - 100px);
+    }
     .center-list {
-        width: 100%;
-        height: 100%;
+        margin-top: 10px;
+        width: calc(10% + 200px);
+        // height: 100%;
 
         .list-schema {
-            width: 80%;
+            width: 200px;
             margin: 0 auto;
             margin-top: 10px;
         }
+
+        .btn-align {
+            display: block;
+            margin: 0 auto;
+            margin-top: 10px;
+
+                
+        .sqlAndClose {
+            height: 100%;
+
+                
+            .sqlData {
+                width: 90%;
+                height: 100%;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .close:hover {
+                cursor: pointer;
+                }
+            }
+        }
+
+        .title-schema {
+            text-align: center;
+        }
+    }
+}
+
+.bottom-flex{
+    display: flex;
+    .right-bottom{
+        margin-left: auto;
     }
 }

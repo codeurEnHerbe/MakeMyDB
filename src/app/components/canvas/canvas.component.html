@@ -1,4 +1,4 @@
-<div (mousedown)="mouseDown($event)" (mousemove)="mouseMove($event)" id="chart" style="border: 1px solid black;height: 500px;width: 1400px;margin-top: 10px;display: inline-block;max-width: 1400px;max-height: 500px;"></div>
+<div (mousedown)="mouseDown($event)" (mousemove)="mouseMove($event)" id="chart"></div>
 
 <div *ngIf="editedEntity">
   <app-entity-edition [entity]="editedEntity" (entityChange)="updateEntity($event)"></app-entity-edition>

@@ -19,16 +19,20 @@ export class EditorComponent implements OnInit {
   storedGraph: SchemaDataDTO;
   currentSchema: SchemaDTO = {name: "Nouveau MCD", schemaData: {entities: [], relations: []} };
   currentUserSchemas: Array<SchemaDTOResponseLight>;
+  sqlData: string;
+  selectedListSchema: SchemaDTOResponseLight;
+  showSchemaList: boolean = true;
+  schemaNotSavedError: boolean = false;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
-    private zone:NgZone) {
+    private zone: NgZone) {
     this.storedGraph = JSON.parse(localStorage.getItem("savedGraph"));
 
   }
 
-  setStat(e){
-    this.mouseStat=e;
+  setStat(e) {
+    this.mouseStat = e;
   }
 
   ngOnInit() {
@@ -43,10 +47,11 @@ export class EditorComponent implements OnInit {
   }
 
   public saveSchema() {
+    this.schemaNotSavedError = false;
     this.schemaService.saveSchema(this.currentSchema).pipe(
-      switchMap( data => {
+      switchMap(data => {
         this.currentSchema.id = data.id;
-
+        console.log(data.id)
         return this.schemaService.loadAllSchemas();
       })
     ).subscribe(
@@ -57,33 +62,42 @@ export class EditorComponent implements OnInit {
     this.cdRef.detectChanges();
   }
 
-  public generateSql(){
+  public generateSql() {
     if(this.verifySchema(this.currentSchema)){
+      this.showSchemaList = false;
+      console.log("generating sql...")
       this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
-        console.log(res);
-      },
-      error => {
-        console.log("Failed", error);
+        this.sqlData = res.body;
+        console.log(res)
+      },error => {
+          if (error.status == 400) {
+            this.schemaNotSavedError = true;
+          }
       });
     }
   }
 
   private loadAllSchemas() {
     this.schemaService.loadAllSchemas()
-    .subscribe(res => {
-      this.currentUserSchemas = res;
-    });
+      .subscribe(res => {
+        this.currentUserSchemas = res;
+      });
   }
 
-  getStoreGraph(schema: SchemaDTOResponseLight) {
-    this.schemaService.loadSchema(schema.id).subscribe(res => {
+  private getStoreGraph(schema: SchemaDTOResponseLight) {
+    this.selectedListSchema = schema;
+    console.log("Get Storad Graph", this.currentSchema)
+  }
+
+  public loadSchema() {
+    this.schemaService.loadSchema(this.selectedListSchema.id).subscribe(res => {
       this.currentSchema = {
         id: res.id,
         name: res.name,
         schemaData: JSON.parse(res.schemaData)
       };
       this.storedGraph = this.currentSchema.schemaData;
-      console.log("Get Storad Graph",this.currentSchema)
+      console.log("Get Storad Graph", this.currentSchema)
     });
   }
 
@@ -137,7 +151,11 @@ export class EditorComponent implements OnInit {
         }
       });
     }
+    console.log("is schema valide :",entitiesValide && relationsValide)
     return entitiesValide && relationsValide;
   }
 
+  enableShowSchemaList(){
+    this.showSchemaList = true;
+  }
 }
