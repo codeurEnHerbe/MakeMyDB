@@ -17,7 +17,7 @@ export class EditorComponent implements OnInit {
 
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
-  currentSchema: SchemaDTO = {name: "Nouveau MCD", schemaData: {entities: [], relations: []} };
+  currentSchema: SchemaDTO = {id: -1, name: "New MCD", schemaData: {entities: [], relations: []} };
   currentUserSchemas: Array<SchemaDTOResponseLight>;
   sqlData: string;
   selectedListSchema: SchemaDTOResponseLight;
@@ -41,7 +41,7 @@ export class EditorComponent implements OnInit {
 
   canvasUpdate($event: SchemaDataDTO){
     if($event.entities){
-      this.currentSchema = {name: "New MCD", schemaData: $event};
+      this.currentSchema.schemaData = $event;
       localStorage.setItem("savedGraph",JSON.stringify($event));
     }
   }
@@ -63,14 +63,16 @@ export class EditorComponent implements OnInit {
 
   public generateSql() {
     if(this.verifySchema(this.currentSchema)){
-      this.showSchemaList = false;
-      this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
-        this.sqlData = res.body;
-      },error => {
-          if (error.status == 400) {
-            this.schemaNotSavedError = true;
-          }
-      });
+      if(this.currentSchema.id){
+        this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
+          this.sqlData = res.body;
+          this.showSchemaList = false;
+        },error => {
+            if (error.status == 400) {
+              this.schemaNotSavedError = true;
+            }
+        });
+      }
     }
   }
 
@@ -81,17 +83,18 @@ export class EditorComponent implements OnInit {
       });
   }
 
-  private getStoreGraph(schema: SchemaDTOResponseLight) {
+  getStoreGraph(schema: SchemaDTOResponseLight) {
     this.selectedListSchema = schema;
   }
 
   public loadSchema() {
     this.schemaService.loadSchema(this.selectedListSchema.id).subscribe(res => {
+      console.log("res",res)
       this.currentSchema = {
         id: res.id,
         name: res.name,
         schemaData: JSON.parse(res.schemaData)
-      };
+      }
       this.storedGraph = this.currentSchema.schemaData;
     });
   }
@@ -99,7 +102,6 @@ export class EditorComponent implements OnInit {
   private verifySchema(shema: SchemaDTO): boolean{
     let entitiesDragable = shema.schemaData.entities;
     let relationsDragable = shema.schemaData.relations;
-
     let entitiesValide = true;
     let relationsValide = true;
 

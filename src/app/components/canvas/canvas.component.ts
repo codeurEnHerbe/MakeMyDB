@@ -53,16 +53,16 @@ export class CanvasComponent implements OnInit, OnChanges {
     if(this.graph && changes.loadedData){
       const { mxGraph, mxGraphModel } = this.mxGraph;
 
-      const container = document.getElementById("chart");
-      const model: mxgraph.mxGraphModel = new mxGraphModel();
+      //const container = document.getElementById("chart");
+      //const model: mxgraph.mxGraphModel = new mxGraphModel();
       this.graph.destroy()
-      this.graph = new mxGraph(container, model);
+      //this.graph = new mxGraph(container, model);
 
       this.entities = [];
       this.relations = [];
-
-      this.setEventHandler(this.graph);
-      this.importeDragables();
+      this.ngOnInit();
+      //this.setEventHandler(this.graph);
+      //this.importeDragables();
     }
   }
   

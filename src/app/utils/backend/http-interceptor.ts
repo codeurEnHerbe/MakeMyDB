@@ -7,7 +7,7 @@ export const InterceptorSkip = 'X-Skip-Interceptor';
 @Injectable()
 export class BackendInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const url = 'http://localhost:8080';
+    const url = 'http://yamikamisama.fr:8080';
     if (req.headers && req.headers.has(InterceptorSkip)) {
       const headers = req.headers.delete(InterceptorSkip);
       return next.handle(req.clone({ url: url + req.url, headers }));
