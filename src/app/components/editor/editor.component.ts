@@ -20,6 +20,8 @@ export class EditorComponent implements OnInit {
   currentUserSchemas: Array<SchemaDTOResponseLight>;
   sqlData: string;
   selectedListSchema: SchemaDTOResponseLight;
+  showSchemaList: boolean = true;
+  schemaNotSavedError: boolean = false;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
@@ -44,10 +46,11 @@ export class EditorComponent implements OnInit {
   }
 
   public saveSchema() {
+    this.schemaNotSavedError = false;
     this.schemaService.saveSchema(this.currentSchema).pipe(
       switchMap(data => {
         this.currentSchema.id = data.id;
-
+        console.log(data.id)
         return this.schemaService.loadAllSchemas();
       })
     ).subscribe(
@@ -58,12 +61,14 @@ export class EditorComponent implements OnInit {
   }
 
   public generateSql() {
+    this.showSchemaList = false;
     this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
-      console.log(res);
-      this.sqlData = res;
+      this.sqlData = res.body;
     },
       error => {
-        console.log("Failed", error);
+        if (error.status == 400) {
+          this.schemaNotSavedError = true;
+        }
       });
   }
 
@@ -87,6 +92,12 @@ export class EditorComponent implements OnInit {
         schemaData: JSON.parse(res.schemaData)
       };
       this.storedGraph = this.currentSchema.schemaData;
+      console.log("Get Storad Graph", this.currentSchema)
     });
   }
+
+  enableShowSchemaList(){
+    this.showSchemaList = true;
+  }
+
 }
