@@ -51,7 +51,6 @@ export class EditorComponent implements OnInit {
     this.schemaService.saveSchema(this.currentSchema).pipe(
       switchMap(data => {
         this.currentSchema.id = data.id;
-        console.log(data.id)
         return this.schemaService.loadAllSchemas();
       })
     ).subscribe(
@@ -65,10 +64,8 @@ export class EditorComponent implements OnInit {
   public generateSql() {
     if(this.verifySchema(this.currentSchema)){
       this.showSchemaList = false;
-      console.log("generating sql...")
       this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
         this.sqlData = res.body;
-        console.log(res)
       },error => {
           if (error.status == 400) {
             this.schemaNotSavedError = true;

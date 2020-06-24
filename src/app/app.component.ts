@@ -18,7 +18,6 @@ export class AppComponent {
   ) {
     this.showLogin = sessionStorage.getItem("isUserConnected") == 'false' || !sessionStorage.getItem("isUserConnected");
     this.userService.getIsUserConnected().subscribe(isUserConnected => { this.showLogin = !isUserConnected; })
-    console.log(this.showLogin)
   }
 
   deleteCookie() {

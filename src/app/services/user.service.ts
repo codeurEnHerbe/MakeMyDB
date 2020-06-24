@@ -27,10 +27,9 @@ export class UserService implements OnInit{
       "password": inputs.password
     }, {observe : 'response',}).subscribe( res =>{
         if(res.status == 200){
-          console.log("Register Success")
           return true;
         }else{
-          console.log("Something went wrong :c")
+          console.error("Something went wrong :c, unable to register")
         }
       }
     );

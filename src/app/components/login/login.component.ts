@@ -26,7 +26,6 @@ export class LoginComponent  {
     if(this.username && this.password){
       this.userService.login(this.username, this.password).subscribe(
         (res) => {
-          console.log(console.log(res));
           this.userService.isUserConnected.next(true);
           sessionStorage.setItem("isUserConnected", "true");
           this.router.navigate(['editor'])
@@ -39,7 +38,4 @@ export class LoginComponent  {
     }
   }
 
-  me(){ 
-    this.userService.userInfos().subscribe(res => console.log(res));
-  }
 }
