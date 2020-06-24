@@ -29,7 +29,9 @@ export class CanvasComponent implements OnInit, OnChanges {
   indexIdElements: number = 2;
   
   entities: Dragable[] = [];
-  editedEntity: Entity;
+  
+  editedDragable: Entity;
+  dragableOldName: string;
 
   relations: Dragable[] = [];
 
@@ -143,27 +145,43 @@ export class CanvasComponent implements OnInit, OnChanges {
     }
   }
 
-  private updateEntity($event){
+  updateDragable($event){
     const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
-    if(existingEntity.length <= 1){
-      if(existingEntity.length > 0 )existingEntity[0].element.name = $event.name;
-      const Dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
-      this.graph.cellLabelChanged(this.changeElement,Dragable.html, false)
-      this.changeElement.geometry.width = Dragable.w;
-      this.changeElement.geometry.height = Dragable.h;
+    const existingRelation = this.relations.filter( relation => relation.element.name.toLowerCase() == $event.name.toLowerCase() );
+    console.log(existingEntity,existingRelation,(existingEntity.length > 1), (existingRelation.length > 1),"/",existingEntity , existingRelation)
+    if( (existingEntity.length > 1) || (existingRelation.length > 1) || (existingEntity.length >= 1 && existingRelation.length >= 1)){
+      Swal.fire({
+        icon: "error",
+        title: "Invalide name !",
+        text: "This name is already used"
+      });
+    }else{
+      this.updateLinkName(this.dragableOldName,$event.name);
+      const dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+      this.graph.cellLabelChanged(this.changeElement,dragable.html, false)
+      this.changeElement.geometry.width = dragable.w;
+      this.changeElement.geometry.height = dragable.h;
       this.graph.refresh(this.changeElement)
       this.changeElement = null;
       this.change.emit({entities: this.entities, relations: this.relations});
-      this.editedEntity = null;
-    }  
+      this.editedDragable = null;
+      this.dragableOldName = null;
+    }
   }
 
-  private updateRelation($event){
-      
+  updateLinkName(oldName: string, newName: string){
+    this.relations.forEach( relationDragable =>{
+      let relation: Relation = relationDragable.element;
+      let link = relation.links.find( link => link.entityName == oldName);
+      if(link){
+        console.log(link)
+        link.entityName = newName;
+        return;
+      }
+    });
   }
 
-  private updateLink($event: Link){
-    console.log($event)
+  updateLink($event: Link){
     this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
     this.graph.refresh(this.changeElement)
     this.change.emit({entities: this.entities, relations: this.relations});
@@ -176,10 +194,10 @@ export class CanvasComponent implements OnInit, OnChanges {
     const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
     Swal.fire({
       icon:"warning",
-      title: `Supprimer "${$event.name}" ?`,
+      title: `Delete "${$event.name}" ?`,
       showCancelButton: true,
-      confirmButtonText: "oui",
-      cancelButtonText: "non"
+      confirmButtonText: "Yes",
+      cancelButtonText: "No"
     }).then( (value)=>{
       if(value.value){
         if(existingEntityIndex != -1){
@@ -191,10 +209,10 @@ export class CanvasComponent implements OnInit, OnChanges {
               rel.element.links.splice(index,1);
             });
           }
-          this.editedEntity = null;
+          this.editedDragable = null;
         }else{
           this.relations.splice(existingRelationIndex,1)
-          this.editedEntity = null;
+          this.editedDragable = null;
         }
         this.graph.removeCells([entityCell]);
         this.changeElement = null;
@@ -208,10 +226,10 @@ export class CanvasComponent implements OnInit, OnChanges {
     if(index > -1){
       Swal.fire({
         icon:"warning",
-        title: `Supprimer le lien entre "${parent.name}" et "${lien.entityName}" ?`,
+        title: `Delete the link between "${parent.name}" and "${lien.entityName}" ?`,
         showCancelButton: true,
-        confirmButtonText: "oui",
-        cancelButtonText: "non"
+        confirmButtonText: "Yes",
+        cancelButtonText: "No"
       }).then( (value)=>{
         if(value.value){
           parent.links.splice(index,1)
@@ -367,7 +385,8 @@ export class CanvasComponent implements OnInit, OnChanges {
               }else{
                 const entity = this.entities.find(ent => ent.elementId == cell.id);
                 const relation = this.relations.find(ent => ent.elementId == cell.id);
-                this.editedEntity = (entity?entity:relation).element;
+                this.editedDragable = (entity?entity:relation).element;
+                this.dragableOldName = (entity?entity:relation).element.name;
               }
               break;
           case(MouseAction.DELETE):
@@ -395,7 +414,7 @@ export class CanvasComponent implements OnInit, OnChanges {
       }
 
       if(this.mouseStat == MouseAction.NEWENTITY){
-        let newElement: Entity = {name: "Entity "+this.indexIdElements++, attributes: []}
+        let newElement: Entity = {name: "Entity_"+this.indexIdElements++, attributes: []}
         this.addNewDragable({
           x: evt.properties.event.layerX - 60,
           y: evt.properties.event.layerY - 15,
@@ -403,7 +422,7 @@ export class CanvasComponent implements OnInit, OnChanges {
           elementId: this.indexIdElements
         }, "Entity", true);
       }else if(this.mouseStat == MouseAction.NEWRELATION){
-        let newElement: Relation = {name: "Entity "+this.indexIdElements++, attributes: [], links: []}
+        let newElement: Relation = {name: "Relation_"+this.indexIdElements++, attributes: [], links: []}
         this.addNewDragable({
           x: evt.properties.event.layerX - 50,
           y: evt.properties.event.layerY - 15,

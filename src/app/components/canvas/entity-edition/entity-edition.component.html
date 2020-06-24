@@ -3,11 +3,11 @@
     <div class="separator"></div>
     <table style="display: inline-block;">
         <tr style="font-weight: bold;text-align: center;display: inline-block;">
-            <td style="width: 192px;">Nom</td>
+            <td style="width: 192px;">Name</td>
             <td style="width: 92px;">Type</td>
-            <td style="width: 92px;">Nombre</td>
-            <td style="width: 92px;">Primaire</td>
-            <td style="width: 100px;"><button style="font-weight: bold;border: none; background: none;color: green;" (click)="entity.attributes.push({name:'', type:'varchar', isPrimary: false})">+</button></td>
+            <td style="width: 92px;">Number</td>
+            <td style="width: 92px;">Primary</td>
+            <td style="width: 100px;"><button style="font-weight: bold;border: none; background: none;color: green;" (click)="newAttribute()">+</button></td>
         </tr>
         <div style="height: 280px;overflow-y: scroll;">
             <div *ngFor="let attr of entity.attributes">
@@ -21,13 +21,15 @@
                         </select>
                     </td>
                     <td>
-                        <input style="width: 92px;" type="number" [name]="'name-'+attr.name" [(ngModel)]="attr.typeNumber">
+                        <div *ngIf="attr.type == 'varchar'">
+                            <input style="width: 92px;" type="number" [name]="'name-'+attr.name" [(ngModel)]="attr.typeNumber">
+                        </div>
                     </td>
                     <td>
                         <input type="checkbox" [(ngModel)]="attr.isPrimary" style="width: 92px;">
                     </td>
                     <td>
-                        <button style="color: red; font-weight: bold;" (click)="removeAttribute(attr)">supprimer</button>
+                        <button style="color: red; font-weight: bold;" (click)="removeAttribute(attr)">delete</button>
                     </td>
                 </tr>
             </div>

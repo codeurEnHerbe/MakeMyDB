@@ -10,7 +10,7 @@
                 <input type="text" [(ngModel)]="currentSchema.name" placeholder="" class="input-xlarge">
             </div>
             <div class="right-bottom">
-                <a *ngIf="schemaNotSavedError" style="color: red"> Veuillez enregistrer le schema avant de générer le SQL</a>
+                <a *ngIf="schemaNotSavedError" style="color: red">Please save the schema before generating the SQL</a>
                 <button class="btn btn-success" (click)="generateSql()">Generate SQL</button>
             </div>
         </div>    

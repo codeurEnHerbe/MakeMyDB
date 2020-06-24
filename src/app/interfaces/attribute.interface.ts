@@ -5,7 +5,5 @@ export interface Attribute{
     name: string,
     type: Type,
     typeNumber?:number,
-    isPrimary: boolean,
-    foreignTable?: Entity,
-    foreignAttribute?: string
+    isPrimary: boolean
 }

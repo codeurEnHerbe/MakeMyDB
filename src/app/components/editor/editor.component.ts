@@ -41,7 +41,7 @@ export class EditorComponent implements OnInit {
 
   canvasUpdate($event: SchemaDataDTO){
     if($event.entities){
-      this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
+      this.currentSchema = {name: "New MCD", schemaData: $event};
       localStorage.setItem("savedGraph",JSON.stringify($event));
     }
   }
@@ -86,7 +86,6 @@ export class EditorComponent implements OnInit {
 
   private getStoreGraph(schema: SchemaDTOResponseLight) {
     this.selectedListSchema = schema;
-    console.log("Get Storad Graph", this.currentSchema)
   }
 
   public loadSchema() {
@@ -97,7 +96,6 @@ export class EditorComponent implements OnInit {
         schemaData: JSON.parse(res.schemaData)
       };
       this.storedGraph = this.currentSchema.schemaData;
-      console.log("Get Storad Graph", this.currentSchema)
     });
   }
 
@@ -116,8 +114,8 @@ export class EditorComponent implements OnInit {
         allAttributesValide = false;
         Swal.fire({
           icon: "error",
-          title: "Schéma incorrect",
-          html: "L'entité <b>\""+entity.name+"\"</b> n'a pas d'attribues."
+          title: "Incorrect schema",
+          html: "The entity <b>\""+entity.name+"\"</b> does not have any attributes."
         });
         return;
       }
@@ -128,8 +126,8 @@ export class EditorComponent implements OnInit {
       if(!havePrimaryKey){
         Swal.fire({
           icon: "error",
-          title: "Schéma incorrect",
-          html: "L'entité <b>\""+entity.name+"\"</b> ne posséde aucune clée primaire"
+          title: "Incorrect schema",
+          html: "The entity <b>\""+entity.name+"\"</b> does not have any primary key"
         });
         return;
       }
@@ -144,14 +142,13 @@ export class EditorComponent implements OnInit {
           relationsValide=false;
           Swal.fire({
             icon: "error",
-            title: "Schéma incorrect",
-            html: "La relation \""+relation.name+"\" ne relie pas assée d'entités"
+            title: "Incorrect schema",
+            html: "The relation \""+relation.name+"\" doesn't link enough entities"
           });
           return;
         }
       });
     }
-    console.log("is schema valide :",entitiesValide && relationsValide)
     return entitiesValide && relationsValide;
   }
 
