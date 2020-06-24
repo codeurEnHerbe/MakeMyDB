@@ -7,6 +7,7 @@
             <a *ngFor="let schema of currentUserSchemas" class="list-group-item list-group-item-action"
                 id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="schema.name"
                 (click)="getStoreGraph(schema)">{{schema.name}}</a>
+        <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="loadSchema()">Load Schema</button>
         </div>
         <div class="sqlAndClose" *ngIf="sqlData && !showSchemaList">
             <textarea class="sqlData form-control smooth-scroll">{{sqlData.response}}</textarea>
@@ -14,7 +15,6 @@
                 <span aria-hidden="true">&times;</span>
             </a>
         </div>
-        <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="loadSchema()">Load Schema</button>
     </div>   
 </div>
 <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
