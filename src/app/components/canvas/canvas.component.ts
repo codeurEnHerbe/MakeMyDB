@@ -19,12 +19,6 @@ export class CanvasComponent implements OnInit, OnChanges {
   @Input() mouseStat;
 
   @Input() loadedData: SchemaDataDTO;
-  
-  sourceSelectedNode: string = null;
-  
-  loadedAllSchemasByName: Array<NamedSchemaDTO> = [];
-  
-  canDragable: boolean;
 
   mxGraph: typeof mxgraph;
   graph: mxgraph.mxGraph;
@@ -38,7 +32,6 @@ export class CanvasComponent implements OnInit, OnChanges {
   editedEntity: Entity;
 
   relations: Dragable[] = [];
-  editedRelation: Relation;
 
   editedLink: Link;
   editedLinkRelationParent: Relation;
@@ -61,7 +54,6 @@ export class CanvasComponent implements OnInit, OnChanges {
 
       const container = document.getElementById("chart");
       const model: mxgraph.mxGraphModel = new mxGraphModel();
-
       this.graph.destroy()
       this.graph = new mxGraph(container, model);
 
@@ -103,203 +95,200 @@ export class CanvasComponent implements OnInit, OnChanges {
     let graph = this.graph;
     var parent = graph.getDefaultParent();
     this.parent = parent;
-    this.setConfig(graph);
 
+    this.setConfig(graph);
     this.setEventHandler(graph);
     this.importeDragables();
   }
 
-    private addNewDragable(newDragable: Dragable, type:"Entity"|"Relation", idNew: boolean = false){
-      
-      const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
-      const existingRelation = this.relations.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
-      console.log("new Dragable", newDragable)
+  private addNewDragable(newDragable: Dragable, type:"Entity"|"Relation", idNew: boolean = false){
+    const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
+    const existingRelation = this.relations.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
+    console.log("new Dragable", newDragable)
 
-      const vertex = this.createEntityVertex(newDragable);
-      
-      if(type == "Entity" && existingEntity.length<1){
-        this.entities.push(newDragable)
-        const newVertex = this.graph.insertVertex(this.parent, newDragable.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
-        if(idNew) newDragable.elementId = newVertex.id;//mxgraph change les id tout seul :/ ducoup pas le choix
-        this.change.emit({entities: this.entities, relations: this.relations})
-        return newVertex;
+    const vertex = this.createEntityVertex(newDragable);
+    
+    if(type == "Entity" && existingEntity.length<1){
+      this.entities.push(newDragable)
+      const newVertex = this.graph.insertVertex(this.parent, newDragable.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h)
+      if(idNew) newDragable.elementId = newVertex.id;//mxgraph change les id tout seul :/ ducoup pas le choix
+      this.change.emit({entities: this.entities, relations: this.relations})
+      return newVertex;
 
-      }else if( type == "Relation" && existingRelation.length<1 ){
-        this.relations.push(newDragable)
-        const newVertex = this.graph.insertVertex(this.parent, newDragable.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;");
-        if(idNew) newDragable.elementId = newVertex.id;
-        this.change.emit({entities: this.entities, relations: this.relations})
-        return newVertex;
-      }
-      
-      return false;
+    }else if( type == "Relation" && existingRelation.length<1 ){
+      this.relations.push(newDragable)
+      const newVertex = this.graph.insertVertex(this.parent, newDragable.elementId ,vertex.html , vertex.x, vertex.y, vertex.w, vertex.h, "rounded=1;shape=ellipse;");
+      if(idNew) newDragable.elementId = newVertex.id;
+      this.change.emit({entities: this.entities, relations: this.relations})
+      return newVertex;
     }
+    
+    return false;
+  }
 
-    private linkDragable(d1: mxgraph.mxCell, d2: mxgraph.mxCell, cardinalMin, cardinalMax, isNew = true, id){
-      const isD1Entity = this.entities.find( entity => entity.elementId == d1.id );
-      const isD2Entity = this.entities.find( entity => entity.elementId == d2.id );
+  private linkDragable(d1: mxgraph.mxCell, d2: mxgraph.mxCell, cardinalMin, cardinalMax, isNew = true, id){
+    const isD1Entity = this.entities.find( entity => entity.elementId == d1.id );
+    const isD2Entity = this.entities.find( entity => entity.elementId == d2.id );
 
-      if(isD1Entity){
-        const relation = this.relations.find( relation => relation.elementId == d2.id );
-        const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
-        if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD1Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
-        this.change.emit({entities: this.entities, relations: this.relations});
-      } else if(isD2Entity) {
-        const relation = this.relations.find( relation => relation.elementId == d1.id );
-        const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
-        if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD2Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
-        this.change.emit({entities: this.entities, relations: this.relations});
-      }
-
-      
+    if(isD1Entity){
+      const relation = this.relations.find( relation => relation.elementId == d2.id );
+      const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
+      if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD1Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
+      this.change.emit({entities: this.entities, relations: this.relations});
+    } else if(isD2Entity) {
+      const relation = this.relations.find( relation => relation.elementId == d1.id );
+      const newLinkCell = this.graph.insertEdge(this.parent, id, cardinalMin+":"+cardinalMax, d1, d2);
+      if(isNew) relation.element.links.push({id: newLinkCell.id,entityName: isD2Entity.element.name, cardinalMax: "1", cardinalMin: "1"})
+      this.change.emit({entities: this.entities, relations: this.relations});
     }
+  }
 
-    private updateEntity($event){
-      const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
-      if(existingEntity.length <= 1){
-        if(existingEntity.length > 0 )existingEntity[0].element.name = $event.name;
-        const Dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
-        this.graph.cellLabelChanged(this.changeElement,Dragable.html, false)
-        this.changeElement.geometry.width = Dragable.w;
-        this.changeElement.geometry.height = Dragable.h;
-        this.graph.refresh(this.changeElement)
+  private updateEntity($event){
+    const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+    if(existingEntity.length <= 1){
+      if(existingEntity.length > 0 )existingEntity[0].element.name = $event.name;
+      const Dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+      this.graph.cellLabelChanged(this.changeElement,Dragable.html, false)
+      this.changeElement.geometry.width = Dragable.w;
+      this.changeElement.geometry.height = Dragable.h;
+      this.graph.refresh(this.changeElement)
+      this.changeElement = null;
+      this.change.emit({entities: this.entities, relations: this.relations});
+      this.editedEntity = null;
+    }  
+  }
+
+  private updateRelation($event){
+      
+  }
+
+  private updateLink($event: Link){
+    console.log($event)
+    this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
+    this.graph.refresh(this.changeElement)
+    this.change.emit({entities: this.entities, relations: this.relations});
+    this.changeElement = null;
+    this.editedLink = null;
+  }
+
+  private deleteEntity(entityCell, $event: Entity){
+    const existingEntityIndex = this.entities.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+    const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+    Swal.fire({
+      icon:"warning",
+      title: `Supprimer "${$event.name}" ?`,
+      showCancelButton: true,
+      confirmButtonText: "oui",
+      cancelButtonText: "non"
+    }).then( (value)=>{
+      if(value.value){
+        if(existingEntityIndex != -1){
+          let deletedElement = this.entities.splice(existingEntityIndex,1)
+          if(deletedElement.length > 0){
+            this.relations.forEach(rel => {
+              console.log(rel.element)
+              const index = rel.element.links.findIndex( link => link.entityName == deletedElement[0].element.name);
+              rel.element.links.splice(index,1);
+            });
+          }
+          this.editedEntity = null;
+        }else{
+          this.relations.splice(existingRelationIndex,1)
+          this.editedEntity = null;
+        }
+        this.graph.removeCells([entityCell]);
         this.changeElement = null;
         this.change.emit({entities: this.entities, relations: this.relations});
-        this.editedEntity = null;
       }
-    }
+    });
+  }
 
-    private updateRelation($event){
-      
-    }
-
-    private updateLink($event: Link){
-      console.log($event)
-      this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
-      this.graph.refresh(this.changeElement)
-      this.change.emit({entities: this.entities, relations: this.relations});
-      this.changeElement = null;
-      this.editedLink = null;
-    }
-
-    private deleteEntity(entityCell, $event: Entity){
-      const existingEntityIndex = this.entities.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
-      const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
+  private deleteLink(linkCell, lien: Link, parent: Relation){
+    const index = parent.links.findIndex(link=> link.id == lien.id )
+    if(index > -1){
       Swal.fire({
         icon:"warning",
-        title: `Supprimer "${$event.name}" ?`,
+        title: `Supprimer le lien entre "${parent.name}" et "${lien.entityName}" ?`,
         showCancelButton: true,
         confirmButtonText: "oui",
         cancelButtonText: "non"
       }).then( (value)=>{
         if(value.value){
-          if(existingEntityIndex != -1){
-            let deletedElement = this.entities.splice(existingEntityIndex,1)
-            if(deletedElement.length > 0){
-              this.relations.forEach(rel => {
-                console.log(rel.element)
-                const index = rel.element.links.findIndex( link => link.entityName == deletedElement[0].element.name);
-                rel.element.links.splice(index,1);
-              });
-            }
-            this.editedEntity = null;
-          }else{
-            this.relations.splice(existingRelationIndex,1)
-            this.editedEntity = null;
-          }
-          this.graph.removeCells([entityCell]);
+          parent.links.splice(index,1)
+          this.graph.removeCells([linkCell]);
           this.changeElement = null;
           this.change.emit({entities: this.entities, relations: this.relations});
         }
       });
+    }else{
+      console.log("not found :",lien, parent.links,index)
     }
+  }
 
-    private deleteLink(linkCell, lien: Link, parent: Relation){
-      const index = parent.links.findIndex(link=> link.id == lien.id )
-      if(index > -1){
-        Swal.fire({
-          icon:"warning",
-          title: `Supprimer le lien entre "${parent.name}" et "${lien.entityName}" ?`,
-          showCancelButton: true,
-          confirmButtonText: "oui",
-          cancelButtonText: "non"
-        }).then( (value)=>{
-          if(value.value){
-            parent.links.splice(index,1)
-            this.graph.removeCells([linkCell]);
-            this.changeElement = null;
-            this.change.emit({entities: this.entities, relations: this.relations});
-          }
-        });
-      }else{
-        console.log("not found :",lien, parent.links,index)
-      }
-    }
+  private createEntityVertex(dragable: Dragable): {html: string, x: number,y: number,w: number,h: number}{
+    let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${dragable.element.name}</div>`
+    html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
+    "<table style='padding-top: 5px; width: 100%'>";
+    let length = 0;
+    dragable.element.attributes.forEach( (element,index) => {
+      let varLength = element.name.length+element.type.length;
+      if(element.foreignAttribute) varLength=varLength+2;
+      if(varLength > length) length=varLength ;
+      html += `<tr style="margin: 0px; padding: 0px; background-color: rgba(100,130,185,${index%2?"0.3":"0"})"><td><div style="text-align: left;padding-left: 5px;font-size: 15px;${element.isPrimary?"text-decoration:underline;":""}">${
+        (element.foreignAttribute?"<b>#&nbsp</b>":"")+element.name
+      }</div></td>`;
+      html += `<td><div style="text-align: right;padding-right: 5px;padding-left: 10px;font-size: 15px;font-weight: bold;">${element.type}</div></td></tr>`;
+    });
+    html += "</table></div>";
+    if(length<dragable.element.name.length) length = dragable.element.name.length;
+    const newVertexData = {html: html, x:dragable.x, y: dragable.y, w: length*9+10<110?110:length*9+10, h: dragable.element.attributes.length*20+30};
+    return newVertexData;  
+  }
 
-    private createEntityVertex(dragable: Dragable): {html: string, x: number,y: number,w: number,h: number}{
-      let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${dragable.element.name}</div>`
-      html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
-      "<table style='padding-top: 5px; width: 100%'>";
-      let length = 0;
-      dragable.element.attributes.forEach( (element,index) => {
-        let varLength = element.name.length+element.type.length;
-        if(element.foreignAttribute) varLength=varLength+2;
-        if(varLength > length) length=varLength ;
-        html += `<tr style="margin: 0px; padding: 0px; background-color: rgba(100,130,185,${index%2?"0.3":"0"})"><td><div style="text-align: left;padding-left: 5px;font-size: 15px;${element.isPrimary?"text-decoration:underline;":""}">${
-          (element.foreignAttribute?"<b>#&nbsp</b>":"")+element.name
-        }</div></td>`;
-        html += `<td><div style="text-align: right;padding-right: 5px;padding-left: 10px;font-size: 15px;font-weight: bold;">${element.type}</div></td></tr>`;
+  private importeDragables(){
+    let indexFromSave = "2";
+    
+    //Chargement des données
+    if(this.loadedData){
+      console.log(this.loadedData)
+      //load entities
+      this.loadedData.entities.forEach( savedEntity => {
+        let loadedEntityDragable = this.addNewDragable(savedEntity, "Entity");
+        console.log("load entity:",loadedEntityDragable)
+        if(loadedEntityDragable){
+          if( Number.parseInt(loadedEntityDragable.id) > Number.parseInt(indexFromSave) ){
+            indexFromSave=loadedEntityDragable.id;
+          } 
+        }
       });
-      html += "</table></div>";
-      if(length<dragable.element.name.length) length = dragable.element.name.length;
-      const newVertexData = {html: html, x:dragable.x, y: dragable.y, w: length*9+10<110?110:length*9+10, h: dragable.element.attributes.length*20+30};
-      return newVertexData;
-    }
-
-    private importeDragables(){
-      let indexFromSave = "2";
-
-        //Chargement des données
-        if(this.loadedData){
-          console.log(this.loadedData)
-          //load entities
-          this.loadedData.entities.forEach( savedEntity => {
-            let loadedEntityDragable = this.addNewDragable(savedEntity, "Entity");
-            console.log("load entity:",loadedEntityDragable)
-            if(loadedEntityDragable){
-              if( Number.parseInt(loadedEntityDragable.id) > Number.parseInt(indexFromSave) ){
-                indexFromSave=loadedEntityDragable.id;
-              } 
-            }
-          });
-
-          //Load Relations
-          this.loadedData.relations.forEach( savedRelation => {
-            const loadedRelationCell = this.addNewDragable(savedRelation,"Relation");
-            console.log("load relation:",loadedRelationCell, "savedRelation",savedRelation)
-            if(loadedRelationCell){
-              if( Number.parseInt(loadedRelationCell.id) > Number.parseInt(indexFromSave) ){
-                indexFromSave=loadedRelationCell.id;
-              } 
-            }
-            if(loadedRelationCell){
-              const relation:Relation = savedRelation.element;
-              relation.links.forEach( link =>{
-                const entityCell = this.parent.children.find( cell=>{
-                  let foundEntity = this.entities.find( ent =>
-                    ent.elementId == cell.id &&
-                    ent.element.name == link.entityName
-                  );
-                  return foundEntity?cell:null;
-                })
-                if(entityCell && loadedRelationCell)
-                  this.linkDragable(entityCell,loadedRelationCell,link.cardinalMin,link.cardinalMax,false,link.id);
-              });
-            }
+  
+      //Load Relations
+      this.loadedData.relations.forEach( savedRelation => {
+        const loadedRelationCell = this.addNewDragable(savedRelation,"Relation");
+        console.log("load relation:",loadedRelationCell, "savedRelation",savedRelation)
+        if(loadedRelationCell){
+          if( Number.parseInt(loadedRelationCell.id) > Number.parseInt(indexFromSave) ){
+            indexFromSave=loadedRelationCell.id;
+          } 
+        }
+        if(loadedRelationCell){
+          const relation:Relation = savedRelation.element;
+          relation.links.forEach( link =>{
+            const entityCell = this.parent.children.find( cell=>{
+              let foundEntity = this.entities.find( ent =>
+                ent.elementId == cell.id &&
+                ent.element.name == link.entityName
+              );
+              return foundEntity?cell:null;
+            })
+            if(entityCell && loadedRelationCell)
+              this.linkDragable(entityCell,loadedRelationCell,link.cardinalMin,link.cardinalMax,false,link.id);
           });
         }
-        this.indexIdElements = Number.parseInt(indexFromSave);
+      });
     }
+    this.indexIdElements = Number.parseInt(indexFromSave);
+  }
 
   private setEventHandler(graph){
     const { mxEvent } = this.mxGraph;
@@ -427,7 +416,9 @@ export class CanvasComponent implements OnInit, OnChanges {
     });
   }
 
-  private setConfig(graph){
+  private setConfig(graph: mxgraph.mxGraph){
+    const { mxConstants, mxEdgeStyle, mxRectangle } = this.mxGraph;
+
     graph.setDropEnabled(false)
     graph.setVertexLabelsMovable(false);
     graph.setDisconnectOnMove(false);
@@ -439,8 +430,8 @@ export class CanvasComponent implements OnInit, OnChanges {
     graph.connectionHandler.constraintHandler.setEnabled(false)
     graph.setAllowDanglingEdges(false);
     graph.setHtmlLabels(true);
-  
-    const { mxConstants, mxEdgeStyle } = this.mxGraph;
+    graph.view.graphBounds.setRect(0,0,10,500)
+    graph.setRecursiveResize(false);
   
     let style = [];
     style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_CONNECTOR;
