@@ -22,7 +22,6 @@ export class EditorComponent implements OnInit {
   sqlData: string;
   selectedListSchema: SchemaDTOResponseLight;
   showSchemaList: boolean = true;
-  schemaNotSavedError: boolean = false;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
@@ -47,7 +46,6 @@ export class EditorComponent implements OnInit {
   }
 
   public saveSchema() {
-    this.schemaNotSavedError = false;
     this.schemaService.saveSchema(this.currentSchema).pipe(
       switchMap(data => {
         this.currentSchema.id = data.id;
@@ -65,13 +63,19 @@ export class EditorComponent implements OnInit {
   public generateSql() {
     if(this.verifySchema(this.currentSchema)){
       this.showSchemaList = false;
+      if(!this.currentSchema.id){
+        Swal.fire({
+          icon: "error",
+          title: "Uknown schema",
+          html: "Please save your schema"
+        });
+      }
       console.log("generating sql...")
       this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
         this.sqlData = res.body;
         console.log(res)
       },error => {
           if (error.status == 400) {
-            this.schemaNotSavedError = true;
           }
       });
     }
@@ -153,9 +157,5 @@ export class EditorComponent implements OnInit {
     }
     console.log("is schema valide :",entitiesValide && relationsValide)
     return entitiesValide && relationsValide;
-  }
-
-  enableShowSchemaList(){
-    this.showSchemaList = true;
   }
 }

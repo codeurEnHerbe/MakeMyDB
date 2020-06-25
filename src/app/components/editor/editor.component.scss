@@ -1,45 +1,51 @@
-.toolbox{
+.toolbox {
     height: 450px;
-    padding-left: 10px; 
-    float: left; 
-    padding-top: 100px;
+    padding-left: 10px;
+    float: left;
 }
-.canvas-list {
+.editor{
+    height: 100%;
     display: flex;
-    .canvas {
-        padding-left: 10px;
-        width: calc( 90% - 100px);
-    }
-    .center-list {
-        margin-top: 10px;
-        width: calc(10% + 200px);
-        // height: 100%;
+    align-items: center;
 
-        .list-schema {
-            width: 200px;
-            margin: 0 auto;
-            margin-top: 10px;
-        }
+    .canvas-list {
+        width: 100%;
+        height: 100%;
+        display: flex;
 
-        .btn-align {
-            display: block;
-            margin: 0 auto;
-            margin-top: 10px;
-
-                
-        .sqlAndClose {
+        .canvas {
+            padding-left: 10px;
             height: 100%;
+            width: calc(90% - 100px);
+        }
+        .center-list {
+            margin-top: 10px;
+            width: calc(10% + 200px);
 
-                
-            .sqlData {
-                width: 90%;
-                height: 100%;
+            .list-schema {
+                width: 200px;
                 margin: 0 auto;
-                display: block;
+                margin-top: 10px;
             }
 
-            .close:hover {
-                cursor: pointer;
+            .btn-align {
+                display: block;
+                margin: 0 auto;
+                margin-top: 10px;
+            }
+
+            .sqlAndClose {
+                height: 100%;
+
+                .sqlData {
+                    width: 90%;
+                    height: 100%;
+                    margin: 0 auto;
+                    display: block;
+                }
+
+                .close:hover {
+                    cursor: pointer;
                 }
             }
         }
@@ -50,9 +56,9 @@
     }
 }
 
-.bottom-flex{
+.bottom-flex {
     display: flex;
-    .right-bottom{
+    .right-bottom {
         margin-left: auto;
     }
 }

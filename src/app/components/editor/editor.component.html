@@ -1,34 +1,35 @@
-<app-tool-box class="toolbox" (stat)="setStat($event)"></app-tool-box>
-
-<div class="canvas-list">
-    <div class="canvas">
-        <app-canvas [mouseStat]="mouseStat" [loadedData]="storedGraph"
-                (change)="canvasUpdate($event)"></app-canvas>
-        <div class="bottom-flex">
-            <div>
-                <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
-                <input type="text" [(ngModel)]="currentSchema.name" placeholder="" class="input-xlarge">
-            </div>
-            <div class="right-bottom">
-                <a *ngIf="schemaNotSavedError" style="color: red"> Veuillez enregistrer le schema avant de générer le SQL</a>
-                <button class="btn btn-success" (click)="generateSql()">Generate SQL</button>
-            </div>
-        </div>    
-    </div>
-    <div class="center-list">
-        <div *ngIf="showSchemaList" class="list-group list-schema" id="list-tab" role="tablist">
-            <a class="title-schema">List Schema</a>
-            <a *ngFor="let schema of currentUserSchemas" class="list-group-item list-group-item-action"
-                id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="schema.name"
-                (click)="getStoreGraph(schema)">{{schema.name}}</a>
-            <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="loadSchema()">Load
-                Schema</button>
+<div class="editor"> 
+    <app-tool-box class="toolbox" (stat)="setStat($event)"></app-tool-box>
+    <div class="canvas-list">
+        <div class="canvas">
+            <app-canvas [mouseStat]="mouseStat" [loadedData]="storedGraph"
+                    (change)="canvasUpdate($event)"></app-canvas>
+            <div class="bottom-flex">
+                <div>
+                    <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
+                    <input type="text" [(ngModel)]="currentSchema.name" placeholder="" class="input-xlarge">
+                </div>
+                <div class="right-bottom">
+                    <a *ngIf="schemaNotSavedError" style="color: red"> Veuillez enregistrer le schema avant de générer le SQL</a>
+                    <button class="btn btn-success" (click)="generateSql()">Generate SQL</button>
+                </div>
+            </div>    
         </div>
-        <div class="sqlAndClose" *ngIf="sqlData && !showSchemaList">
-            <textarea class="sqlData form-control smooth-scroll">{{sqlData.response}}</textarea>
-            <a (click)="enableShowSchemaList()" class="close" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </a>
+        <div class="center-list">
+            <div *ngIf="showSchemaList" class="list-group list-schema" id="list-tab" role="tablist">
+                <a class="title-schema">List Schema</a>
+                <a *ngFor="let schema of currentUserSchemas" class="list-group-item list-group-item-action"
+                    id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="schema.name"
+                    (click)="getStoreGraph(schema)">{{schema.name}}</a>
+                <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="loadSchema()">Load
+                    Schema</button>
+            </div>
+            <div class="sqlAndClose" *ngIf="sqlData && !showSchemaList">
+                <textarea class="sqlData form-control smooth-scroll">{{sqlData.response}}</textarea>
+                <a (click)="showSchemaList = true" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
