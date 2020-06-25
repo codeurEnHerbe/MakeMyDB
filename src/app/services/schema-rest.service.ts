@@ -33,9 +33,7 @@ export class SchemaRestService {
     return this.http.get<string>(`/api/schema/generate/` + idSchema, {observe: 'response'})
   }
 
-  deleteSchema(): Observable<any>{
-    
-    console.log("value")
-    return of();
+  deleteSchema(id: number): Observable<any> {
+    return this.http.get(`/api/schema/delete/` + id);
   }
 }
