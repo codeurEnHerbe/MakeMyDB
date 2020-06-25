@@ -5,11 +5,11 @@ import { Type } from 'src/app/interfaces/type.enum';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-entity-edition',
-  templateUrl: './entity-edition.component.html',
-  styleUrls: ['./entity-edition.component.scss']
+  selector: 'app-dragable-edition',
+  templateUrl: './dragable-edition.component.html',
+  styleUrls: ['./dragable-edition.component.scss']
 })
-export class EntityEditionComponent implements OnInit {
+export class DragableEditionComponent implements OnInit {
 
   @Input()
   entity: Entity;
@@ -51,7 +51,7 @@ export class EntityEditionComponent implements OnInit {
         });
       }
       if( (attribute.type == Type.varchar)
-      && (attribute.typeNumber == undefined || attribute.typeNumber <= 0)){
+      && (attribute.typeNumber != undefined && attribute.typeNumber <= 0)){
         ok=false;
         Swal.fire({
           icon: "error",

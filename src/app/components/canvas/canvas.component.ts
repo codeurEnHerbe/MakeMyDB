@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, OnChanges, EventEmitter } from '@angular/core';
 import { Dragable } from "src/app/interfaces/dragable.interface";
-import { SchemaRestService, NamedSchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
 import { Entity } from 'src/app/interfaces/entity.interface';
@@ -46,23 +45,17 @@ export class CanvasComponent implements OnInit, OnChanges {
   @Output()
   change: EventEmitter<SchemaDataDTO> = new EventEmitter();
 
-  constructor(private schemaRestService:SchemaRestService) { 
+  constructor() { 
   }
 
   ngOnChanges(changes: any): void {
     if(this.graph && changes.loadedData){
       const { mxGraph, mxGraphModel } = this.mxGraph;
-
-      //const container = document.getElementById("chart");
-      //const model: mxgraph.mxGraphModel = new mxGraphModel();
       this.graph.destroy()
-      //this.graph = new mxGraph(container, model);
 
       this.entities = [];
       this.relations = [];
       this.ngOnInit();
-      //this.setEventHandler(this.graph);
-      //this.importeDragables();
     }
   }
   
@@ -240,7 +233,7 @@ export class CanvasComponent implements OnInit, OnChanges {
 
   private createEntityVertex(dragable: Dragable): {html: string, x: number,y: number,w: number,h: number}{
     let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${dragable.element.name}</div>`
-    html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
+    html += "<hr style='display: block;width: 100%;background-color: black;padding: 0px;margin: 0px;'></hr>"+
     "<table style='padding-top: 5px; width: 100%'>";
     let length = 0;
     dragable.element.attributes.forEach( (element,index) => {
@@ -306,18 +299,18 @@ export class CanvasComponent implements OnInit, OnChanges {
     graph.addListener(mxEvent.CELLS_MOVED,(sender, evt)=>{
       graph.cellsOrdered(evt.properties.cells,false)
       let dragable:mxgraph.mxCell = evt.properties.cells[0]
-      let froundEntity = this.entities.find(ent => {
+      let foundEntity = this.entities.find(ent => {
         return ent.elementId == dragable.id
       })
-      let froundRelation = this.relations.find(rel => {
+      let foundRelation = this.relations.find(rel => {
         return rel.elementId == dragable.id
       })
-      if(froundEntity){
-        froundEntity.x = dragable.geometry.x
-        froundEntity.y = dragable.geometry.y
-      }else if(froundRelation){
-        froundRelation.x = dragable.geometry.x
-        froundRelation.y = dragable.geometry.y
+      if(foundEntity){
+        foundEntity.x = dragable.geometry.x
+        foundEntity.y = dragable.geometry.y
+      }else if(foundRelation){
+        foundRelation.x = dragable.geometry.x
+        foundRelation.y = dragable.geometry.y
       }
       
       this.change.emit({entities: this.entities, relations: this.relations})
@@ -332,18 +325,18 @@ export class CanvasComponent implements OnInit, OnChanges {
 
         switch(this.mouseStat){
           case (MouseAction.LINK):
-            let froundEntity: Dragable = this.entities.find(ent => ent.elementId == cell.id)
-            let froundRelation: Dragable = this.relations.find(rel => rel.elementId == cell.id)
+            let foundEntity: Dragable = this.entities.find(ent => ent.elementId == cell.id)
+            let foundRelation: Dragable = this.relations.find(rel => rel.elementId == cell.id)
 
             if(!this.selectedElement){
-              if(froundEntity){
-                this.selectedElement = {cell: cell, cellModel: froundEntity, type:"Entity"};
+              if(foundEntity){
+                this.selectedElement = {cell: cell, cellModel: foundEntity, type:"Entity"};
               }else{
-                this.selectedElement = {cell: cell, cellModel: froundRelation, type:"Relation"};
+                this.selectedElement = {cell: cell, cellModel: foundRelation, type:"Relation"};
               }
             }else{
-              if( (froundEntity && this.selectedElement.type == "Relation") ||
-              (froundRelation && this.selectedElement.type == "Entity")){  
+              if( (foundEntity && this.selectedElement.type == "Relation") ||
+              (foundRelation && this.selectedElement.type == "Entity")){  
                 let vertex: mxgraph.mxCell  = cell;
                 this.linkDragable(this.selectedElement.cell,vertex,1,1,true,this.indexIdElements);
                 this.indexIdElements++;
@@ -386,7 +379,7 @@ export class CanvasComponent implements OnInit, OnChanges {
               let linkToDelete = linkRelationSource.element.links.find( link => link.id == cell.id )
               this.deleteLink(cell,linkToDelete,linkRelationSource.element)
                 
-              //cas edition Dragable (entity/relation)
+            //cas edition Dragable (entity/relation)
             }else{
               const entity = this.entities.find(ent => ent.elementId == cell.id);
               const relation = this.relations.find(ent => ent.elementId == cell.id);

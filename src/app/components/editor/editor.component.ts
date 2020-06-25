@@ -23,6 +23,7 @@ export class EditorComponent implements OnInit {
   selectedListSchema: SchemaDTOResponseLight;
   showSchemaList: boolean = true;
   schemaNotSavedError: boolean = false;
+  userConnected: boolean;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
@@ -36,6 +37,7 @@ export class EditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.userConnected = sessionStorage.getItem("isUserConnected") == "true";
     this.loadAllSchemas();
   }
 

@@ -1,7 +1,7 @@
 <div (mousedown)="mouseDown($event)" (mousemove)="mouseMove($event)" id="chart"></div>
 
 <div *ngIf="editedDragable">
-  <app-entity-edition [entity]="editedDragable" (entityChange)="updateDragable($event)"></app-entity-edition>
+  <app-dragable-edition [entity]="editedDragable" (entityChange)="updateDragable($event)"></app-dragable-edition>
 </div>
 <div *ngIf="editedLink">
   <app-link-edition [link]="editedLink" (linkChange)="updateLink($event)"></app-link-edition>

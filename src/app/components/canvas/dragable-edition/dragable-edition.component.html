@@ -24,6 +24,9 @@
                         <div *ngIf="attr.type == 'varchar'">
                             <input style="width: 92px;" type="number" [name]="'name-'+attr.name" [(ngModel)]="attr.typeNumber">
                         </div>
+                        <div *ngIf="attr.type != 'varchar'">
+                            <div style="width: 92px;"></div>
+                        </div>
                     </td>
                     <td>
                         <input type="checkbox" [(ngModel)]="attr.isPrimary" style="width: 92px;">

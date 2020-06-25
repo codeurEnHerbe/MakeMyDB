@@ -44,3 +44,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+#conf conflict
+/proxy.conf.json
+/src/app/utils/backend/http-interceptor.ts

@@ -4,7 +4,7 @@
     <div class="canvas">
         <app-canvas [mouseStat]="mouseStat" [loadedData]="storedGraph"
                 (change)="canvasUpdate($event)"></app-canvas>
-        <div class="bottom-flex">
+        <div *ngIf="userConnected" class="bottom-flex">
             <div>
                 <button class="btn btn-success" (click)="saveSchema()">Save Schema</button>
                 <input type="text" [(ngModel)]="currentSchema.name" placeholder="" class="input-xlarge">
@@ -15,7 +15,7 @@
             </div>
         </div>    
     </div>
-    <div class="center-list">
+    <div *ngIf="userConnected" class="center-list">
         <div *ngIf="showSchemaList" class="list-group list-schema" id="list-tab" role="tablist">
             <a class="title-schema">List Schema</a>
             <a *ngFor="let schema of currentUserSchemas" class="list-group-item list-group-item-action"

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EntityEditionComponent } from './entity-edition.component';
+import { DragableEditionComponent } from './dragable-edition.component';
 
 describe('EntityEditionComponent', () => {
-  let component: EntityEditionComponent;
-  let fixture: ComponentFixture<EntityEditionComponent>;
+  let component: DragableEditionComponent;
+  let fixture: ComponentFixture<DragableEditionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EntityEditionComponent ]
+      declarations: [ DragableEditionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EntityEditionComponent);
+    fixture = TestBed.createComponent(DragableEditionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
