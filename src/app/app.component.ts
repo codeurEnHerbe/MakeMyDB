@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { UserService } from './services/user.service';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -18,7 +18,6 @@ export class AppComponent {
   ) {
     this.showLogin = sessionStorage.getItem("isUserConnected") == 'false' || !sessionStorage.getItem("isUserConnected");
     this.userService.getIsUserConnected().subscribe(isUserConnected => { this.showLogin = !isUserConnected; })
-    console.log(this.showLogin)
   }
 
   deleteCookie() {

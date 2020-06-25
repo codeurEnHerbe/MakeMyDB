@@ -24,7 +24,6 @@ export class LinkEditionComponent implements OnInit {
 
   validate(){
     this.linkChange.emit(this.link);
-    console.log("this.link"+this.link)
   }
 
   setCardinal($val){

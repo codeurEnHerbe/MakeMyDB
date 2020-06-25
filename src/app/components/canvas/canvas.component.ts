@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, OnChanges, EventEmitter } from '@angular/core';
 import { Dragable } from "src/app/interfaces/dragable.interface";
-import { SchemaRestService, NamedSchemaDTO } from 'src/app/services/schema-rest.service';
 import { MouseAction } from '../tool-box/tool-box.component';
 import { mxgraph, mxgraphFactory } from "ts-mxgraph";
 import { Entity } from 'src/app/interfaces/entity.interface';
@@ -29,7 +28,9 @@ export class CanvasComponent implements OnInit, OnChanges {
   indexIdElements: number = 2;
   
   entities: Dragable[] = [];
-  editedEntity: Entity;
+  
+  editedDragable: Entity;
+  dragableOldName: string;
 
   relations: Dragable[] = [];
 
@@ -44,24 +45,17 @@ export class CanvasComponent implements OnInit, OnChanges {
   @Output()
   change: EventEmitter<SchemaDataDTO> = new EventEmitter();
 
-  constructor(private schemaRestService:SchemaRestService) { 
+  constructor() { 
   }
 
   ngOnChanges(changes: any): void {
     if(this.graph && changes.loadedData){
-      console.log("Rechargement du schéma")
       const { mxGraph, mxGraphModel } = this.mxGraph;
-
-      const container = document.getElementById("chart");
-      const model: mxgraph.mxGraphModel = new mxGraphModel();
       this.graph.destroy()
-      this.graph = new mxGraph(container, model);
 
       this.entities = [];
       this.relations = [];
-
-      this.setEventHandler(this.graph);
-      this.importeDragables();
+      this.ngOnInit();
     }
   }
   
@@ -104,7 +98,6 @@ export class CanvasComponent implements OnInit, OnChanges {
   private addNewDragable(newDragable: Dragable, type:"Entity"|"Relation", idNew: boolean = false){
     const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
     const existingRelation = this.relations.filter( entity => entity.element.name.toLowerCase() == newDragable.element.name.toLowerCase() );
-    console.log("new Dragable", newDragable)
 
     const vertex = this.createEntityVertex(newDragable);
     
@@ -143,27 +136,41 @@ export class CanvasComponent implements OnInit, OnChanges {
     }
   }
 
-  private updateEntity($event){
+  updateDragable($event){
     const existingEntity = this.entities.filter( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
-    if(existingEntity.length <= 1){
-      if(existingEntity.length > 0 )existingEntity[0].element.name = $event.name;
-      const Dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
-      this.graph.cellLabelChanged(this.changeElement,Dragable.html, false)
-      this.changeElement.geometry.width = Dragable.w;
-      this.changeElement.geometry.height = Dragable.h;
+    const existingRelation = this.relations.filter( relation => relation.element.name.toLowerCase() == $event.name.toLowerCase() );
+    if( (existingEntity.length > 1) || (existingRelation.length > 1) || (existingEntity.length >= 1 && existingRelation.length >= 1)){
+      Swal.fire({
+        icon: "error",
+        title: "Invalide name !",
+        text: "This name is already used"
+      });
+    }else{
+      this.updateLinkName(this.dragableOldName,$event.name);
+      const dragable = this.createEntityVertex({element: $event, elementId:null, x:this.changeElement.geometry.x, y:this.changeElement.geometry.y});
+      this.graph.cellLabelChanged(this.changeElement,dragable.html, false)
+      this.changeElement.geometry.width = dragable.w;
+      this.changeElement.geometry.height = dragable.h;
       this.graph.refresh(this.changeElement)
       this.changeElement = null;
       this.change.emit({entities: this.entities, relations: this.relations});
-      this.editedEntity = null;
-    }  
+      this.editedDragable = null;
+      this.dragableOldName = null;
+    }
   }
 
-  private updateRelation($event){
-      
+  updateLinkName(oldName: string, newName: string){
+    this.relations.forEach( relationDragable =>{
+      let relation: Relation = relationDragable.element;
+      let link = relation.links.find( link => link.entityName == oldName);
+      if(link){
+        link.entityName = newName;
+        return;
+      }
+    });
   }
 
-  private updateLink($event: Link){
-    console.log($event)
+  updateLink($event: Link){
     this.graph.cellLabelChanged(this.changeElement,$event.cardinalMin+" : "+$event.cardinalMax, false)
     this.graph.refresh(this.changeElement)
     this.change.emit({entities: this.entities, relations: this.relations});
@@ -176,25 +183,24 @@ export class CanvasComponent implements OnInit, OnChanges {
     const existingRelationIndex = this.relations.findIndex( entity => entity.element.name.toLowerCase() == $event.name.toLowerCase() );
     Swal.fire({
       icon:"warning",
-      title: `Supprimer "${$event.name}" ?`,
+      title: `Delete "${$event.name}" ?`,
       showCancelButton: true,
-      confirmButtonText: "oui",
-      cancelButtonText: "non"
+      confirmButtonText: "Yes",
+      cancelButtonText: "No"
     }).then( (value)=>{
       if(value.value){
         if(existingEntityIndex != -1){
           let deletedElement = this.entities.splice(existingEntityIndex,1)
           if(deletedElement.length > 0){
             this.relations.forEach(rel => {
-              console.log(rel.element)
               const index = rel.element.links.findIndex( link => link.entityName == deletedElement[0].element.name);
               rel.element.links.splice(index,1);
             });
           }
-          this.editedEntity = null;
+          this.editedDragable = null;
         }else{
           this.relations.splice(existingRelationIndex,1)
-          this.editedEntity = null;
+          this.editedDragable = null;
         }
         this.graph.removeCells([entityCell]);
         this.changeElement = null;
@@ -208,10 +214,10 @@ export class CanvasComponent implements OnInit, OnChanges {
     if(index > -1){
       Swal.fire({
         icon:"warning",
-        title: `Supprimer le lien entre "${parent.name}" et "${lien.entityName}" ?`,
+        title: `Delete the link between "${parent.name}" and "${lien.entityName}" ?`,
         showCancelButton: true,
-        confirmButtonText: "oui",
-        cancelButtonText: "non"
+        confirmButtonText: "Yes",
+        cancelButtonText: "No"
       }).then( (value)=>{
         if(value.value){
           parent.links.splice(index,1)
@@ -221,13 +227,13 @@ export class CanvasComponent implements OnInit, OnChanges {
         }
       });
     }else{
-      console.log("not found :",lien, parent.links,index)
+      console.error("not found :",lien, parent.links,index)
     }
   }
 
   private createEntityVertex(dragable: Dragable): {html: string, x: number,y: number,w: number,h: number}{
     let html = `<div><div style="text-align: center;padding: 2px;font-size: 15px;font-weight: bold;">${dragable.element.name}</div>`
-    html += "<div style='display: block;width: 100%;height: 1px;background-color: black;padding: 0px;margin: 0px;'></div>"+
+    html += "<hr style='display: block;width: 100%;background-color: black;padding: 0px;margin: 0px;'></hr>"+
     "<table style='padding-top: 5px; width: 100%'>";
     let length = 0;
     dragable.element.attributes.forEach( (element,index) => {
@@ -250,11 +256,9 @@ export class CanvasComponent implements OnInit, OnChanges {
     
     //Chargement des données
     if(this.loadedData){
-      console.log(this.loadedData)
       //load entities
       this.loadedData.entities.forEach( savedEntity => {
         let loadedEntityDragable = this.addNewDragable(savedEntity, "Entity");
-        console.log("load entity:",loadedEntityDragable)
         if(loadedEntityDragable){
           if( Number.parseInt(loadedEntityDragable.id) > Number.parseInt(indexFromSave) ){
             indexFromSave=loadedEntityDragable.id;
@@ -265,7 +269,6 @@ export class CanvasComponent implements OnInit, OnChanges {
       //Load Relations
       this.loadedData.relations.forEach( savedRelation => {
         const loadedRelationCell = this.addNewDragable(savedRelation,"Relation");
-        console.log("load relation:",loadedRelationCell, "savedRelation",savedRelation)
         if(loadedRelationCell){
           if( Number.parseInt(loadedRelationCell.id) > Number.parseInt(indexFromSave) ){
             indexFromSave=loadedRelationCell.id;
@@ -295,24 +298,19 @@ export class CanvasComponent implements OnInit, OnChanges {
 
     graph.addListener(mxEvent.CELLS_MOVED,(sender, evt)=>{
       graph.cellsOrdered(evt.properties.cells,false)
-      let Dragable:mxgraph.mxCell = evt.properties.cells[0]
-      console.log("name",Dragable.getAttribute("name"))
-      let froundEntity = this.entities.find(ent => {
-        console.log("ent.elementId == Dragable.id",ent.elementId ,Dragable.id)
-        return ent.elementId == Dragable.id
+      let dragable:mxgraph.mxCell = evt.properties.cells[0]
+      let foundEntity = this.entities.find(ent => {
+        return ent.elementId == dragable.id
       })
-      let froundRelation = this.relations.find(rel => {
-        console.log("rel.elementId == Dragable.id",rel.elementId ,Dragable.id)
-        return rel.elementId == Dragable.id
+      let foundRelation = this.relations.find(rel => {
+        return rel.elementId == dragable.id
       })
-      console.log("froundEntity:",froundEntity,"froundRelation:",froundRelation)
-      console.log(Dragable.geometry)
-      if(froundEntity){
-        froundEntity.x = Dragable.geometry.x
-        froundEntity.y = Dragable.geometry.y
-      }else if(froundRelation){
-        froundRelation.x = Dragable.geometry.x
-        froundRelation.y = Dragable.geometry.y
+      if(foundEntity){
+        foundEntity.x = dragable.geometry.x
+        foundEntity.y = dragable.geometry.y
+      }else if(foundRelation){
+        foundRelation.x = dragable.geometry.x
+        foundRelation.y = dragable.geometry.y
       }
       
       this.change.emit({entities: this.entities, relations: this.relations})
@@ -321,25 +319,24 @@ export class CanvasComponent implements OnInit, OnChanges {
     //Event Listener
     graph.addListener("click",(sender, evt)=>{
       const cell: mxgraph.mxCell = evt.properties.cell;
-      console.log(cell)
       if(cell){
         let linkRelationTarget;
         let linkRelationSource;
 
         switch(this.mouseStat){
           case (MouseAction.LINK):
-            let froundEntity: Dragable = this.entities.find(ent => ent.elementId == cell.id)
-            let froundRelation: Dragable = this.relations.find(rel => rel.elementId == cell.id)
+            let foundEntity: Dragable = this.entities.find(ent => ent.elementId == cell.id)
+            let foundRelation: Dragable = this.relations.find(rel => rel.elementId == cell.id)
 
             if(!this.selectedElement){
-              if(froundEntity){
-                this.selectedElement = {cell: cell, cellModel: froundEntity, type:"Entity"};
+              if(foundEntity){
+                this.selectedElement = {cell: cell, cellModel: foundEntity, type:"Entity"};
               }else{
-                this.selectedElement = {cell: cell, cellModel: froundRelation, type:"Relation"};
+                this.selectedElement = {cell: cell, cellModel: foundRelation, type:"Relation"};
               }
             }else{
-              if( (froundEntity && this.selectedElement.type == "Relation") ||
-              (froundRelation && this.selectedElement.type == "Entity")){  
+              if( (foundEntity && this.selectedElement.type == "Relation") ||
+              (foundRelation && this.selectedElement.type == "Entity")){  
                 let vertex: mxgraph.mxCell  = cell;
                 this.linkDragable(this.selectedElement.cell,vertex,1,1,true,this.indexIdElements);
                 this.indexIdElements++;
@@ -357,17 +354,16 @@ export class CanvasComponent implements OnInit, OnChanges {
               if(linkRelationTarget){
                 this.editedLink = linkRelationTarget.element.links.find( link => link.id == cell.id )
                 this.editedLinkRelationParent = linkRelationTarget.element;
-                console.log(linkRelationTarget.elementId, "cell.id", cell.id,linkRelationTarget.element.links)
               }else if(linkRelationSource){
                 this.editedLink = linkRelationSource.element.links.find( link => link.id == cell.id )
                 this.editedLinkRelationParent = linkRelationSource.element;
-                console.log(linkRelationSource.elementId, "this.editedLink",this.editedLink)
 
               //cas edition Dragable (entity/relation)
               }else{
                 const entity = this.entities.find(ent => ent.elementId == cell.id);
                 const relation = this.relations.find(ent => ent.elementId == cell.id);
-                this.editedEntity = (entity?entity:relation).element;
+                this.editedDragable = (entity?entity:relation).element;
+                this.dragableOldName = (entity?entity:relation).element.name;
               }
               break;
           case(MouseAction.DELETE):
@@ -375,7 +371,6 @@ export class CanvasComponent implements OnInit, OnChanges {
 
             linkRelationTarget = this.relations.find(ent => this.changeElement.target && ent.elementId == this.changeElement.target.id);
             linkRelationSource = this.relations.find(ent => this.changeElement.source && ent.elementId == this.changeElement.source.id);
-            console.log(linkRelationTarget,":",linkRelationSource)
             if(linkRelationTarget){
               let linkToDelete  = linkRelationTarget.element.links.find( link => link.id == cell.id )
               this.deleteLink(cell,linkToDelete,linkRelationTarget.element)
@@ -384,7 +379,7 @@ export class CanvasComponent implements OnInit, OnChanges {
               let linkToDelete = linkRelationSource.element.links.find( link => link.id == cell.id )
               this.deleteLink(cell,linkToDelete,linkRelationSource.element)
                 
-              //cas edition Dragable (entity/relation)
+            //cas edition Dragable (entity/relation)
             }else{
               const entity = this.entities.find(ent => ent.elementId == cell.id);
               const relation = this.relations.find(ent => ent.elementId == cell.id);
@@ -395,7 +390,7 @@ export class CanvasComponent implements OnInit, OnChanges {
       }
 
       if(this.mouseStat == MouseAction.NEWENTITY){
-        let newElement: Entity = {name: "Entity "+this.indexIdElements++, attributes: []}
+        let newElement: Entity = {name: "Entity_"+this.indexIdElements++, attributes: []}
         this.addNewDragable({
           x: evt.properties.event.layerX - 60,
           y: evt.properties.event.layerY - 15,
@@ -403,7 +398,7 @@ export class CanvasComponent implements OnInit, OnChanges {
           elementId: this.indexIdElements
         }, "Entity", true);
       }else if(this.mouseStat == MouseAction.NEWRELATION){
-        let newElement: Relation = {name: "Entity "+this.indexIdElements++, attributes: [], links: []}
+        let newElement: Relation = {name: "Relation_"+this.indexIdElements++, attributes: [], links: []}
         this.addNewDragable({
           x: evt.properties.event.layerX - 50,
           y: evt.properties.event.layerY - 15,

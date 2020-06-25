@@ -15,7 +15,7 @@ import { IndexComponent } from './components/index/index.component';
 import { RegisterComponent } from './components/register/register.component';
 import { BackendInterceptor } from './utils/backend/http-interceptor';
 import { ReactiveFormsModule } from '@angular/forms';
-import { EntityEditionComponent } from './components/canvas/entity-edition/entity-edition.component';
+import { DragableEditionComponent } from './components/canvas/dragable-edition/dragable-edition.component';
 import { LoginComponent } from './components/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
 import { LinkEditionComponent } from './components/canvas/link-edition/link-edition.component';
@@ -29,7 +29,7 @@ import { ShowSqlComponent } from './components/show-sql/show-sql.component';
     ToolBoxComponent,
     IndexComponent,
     RegisterComponent,
-    EntityEditionComponent,
+    DragableEditionComponent,
     LoginComponent,
     LinkEditionComponent,
     ShowSqlComponent

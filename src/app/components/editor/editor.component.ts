@@ -17,11 +17,13 @@ export class EditorComponent implements OnInit {
 
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
-  currentSchema: SchemaDTO = {name: "Nouveau MCD", schemaData: {entities: [], relations: []} };
+  currentSchema: SchemaDTO = {id: -1, name: "New MCD", schemaData: {entities: [], relations: []} };
   currentUserSchemas: Array<SchemaDTOResponseLight>;
   sqlData: string;
   selectedListSchema: SchemaDTOResponseLight;
   showSchemaList: boolean = true;
+  schemaNotSavedError: boolean = false;
+  userConnected: boolean;
 
   constructor(private schemaService: SchemaRestService,
     private cdRef: ChangeDetectorRef,
@@ -35,12 +37,13 @@ export class EditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.userConnected = sessionStorage.getItem("isUserConnected") == "true";
     this.loadAllSchemas();
   }
 
   canvasUpdate($event: SchemaDataDTO){
     if($event.entities){
-      this.currentSchema = {name: "Nouveau MCD", schemaData: $event};
+      this.currentSchema.schemaData = $event;
       localStorage.setItem("savedGraph",JSON.stringify($event));
     }
   }
@@ -49,7 +52,6 @@ export class EditorComponent implements OnInit {
     this.schemaService.saveSchema(this.currentSchema).pipe(
       switchMap(data => {
         this.currentSchema.id = data.id;
-        console.log(data.id)
         return this.schemaService.loadAllSchemas();
       })
     ).subscribe(
@@ -88,27 +90,25 @@ export class EditorComponent implements OnInit {
       });
   }
 
-  private getStoreGraph(schema: SchemaDTOResponseLight) {
+  getStoreGraph(schema: SchemaDTOResponseLight) {
     this.selectedListSchema = schema;
-    console.log("Get Storad Graph", this.currentSchema)
   }
 
   public loadSchema() {
     this.schemaService.loadSchema(this.selectedListSchema.id).subscribe(res => {
+      console.log("res",res)
       this.currentSchema = {
         id: res.id,
         name: res.name,
         schemaData: JSON.parse(res.schemaData)
-      };
+      }
       this.storedGraph = this.currentSchema.schemaData;
-      console.log("Get Storad Graph", this.currentSchema)
     });
   }
 
   private verifySchema(shema: SchemaDTO): boolean{
     let entitiesDragable = shema.schemaData.entities;
     let relationsDragable = shema.schemaData.relations;
-
     let entitiesValide = true;
     let relationsValide = true;
 
@@ -120,8 +120,8 @@ export class EditorComponent implements OnInit {
         allAttributesValide = false;
         Swal.fire({
           icon: "error",
-          title: "Schéma incorrect",
-          html: "L'entité <b>\""+entity.name+"\"</b> n'a pas d'attribues."
+          title: "Incorrect schema",
+          html: "The entity <b>\""+entity.name+"\"</b> does not have any attributes."
         });
         return;
       }
@@ -132,8 +132,8 @@ export class EditorComponent implements OnInit {
       if(!havePrimaryKey){
         Swal.fire({
           icon: "error",
-          title: "Schéma incorrect",
-          html: "L'entité <b>\""+entity.name+"\"</b> ne posséde aucune clée primaire"
+          title: "Incorrect schema",
+          html: "The entity <b>\""+entity.name+"\"</b> does not have any primary key"
         });
         return;
       }
@@ -148,14 +148,13 @@ export class EditorComponent implements OnInit {
           relationsValide=false;
           Swal.fire({
             icon: "error",
-            title: "Schéma incorrect",
-            html: "La relation \""+relation.name+"\" ne relie pas assée d'entités"
+            title: "Incorrect schema",
+            html: "The relation \""+relation.name+"\" doesn't link enough entities"
           });
           return;
         }
       });
     }
-    console.log("is schema valide :",entitiesValide && relationsValide)
     return entitiesValide && relationsValide;
   }
 }
