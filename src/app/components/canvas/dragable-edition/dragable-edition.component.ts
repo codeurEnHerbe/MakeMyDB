@@ -87,7 +87,7 @@ export class DragableEditionComponent implements OnInit {
   }
 
   newAttribute(){
-    let newAttribut = {name:'New attribute', type: Type.varchar, isPrimary: false};
+    let newAttribut = {name:'new_attribute', type: Type.varchar, isPrimary: false};
     this.entity.attributes.push(newAttribut);
   }
 
