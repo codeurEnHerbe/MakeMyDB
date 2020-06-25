@@ -23,6 +23,8 @@
                     (click)="getStoreGraph(schema)">{{schema.name}}</a>
                 <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="loadSchema()">Load
                     Schema</button>
+                <button *ngIf="selectedListSchema" class="btn btn-success btn-align" (click)="deleteSchema()">Delete
+                    Schema</button>
             </div>
             <div class="sqlAndClose" *ngIf="sqlData && !showSchemaList">
                 <textarea class="sqlData form-control smooth-scroll">{{sqlData.response}}</textarea>

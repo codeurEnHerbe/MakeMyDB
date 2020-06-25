@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { SchemaDataDTO, SchemaDTO, SchemaDTOResponseLight, SchemaDTOResponse, } from '../interfaces/schema-data.interface';
 
 
@@ -31,5 +31,11 @@ export class SchemaRestService {
 
   generateSql(idSchema: number): Observable<HttpResponse<string>> {
     return this.http.get<string>(`/api/schema/generate/` + idSchema, {observe: 'response'})
+  }
+
+  deleteSchema(): Observable<any>{
+    
+    console.log("value")
+    return of();
   }
 }

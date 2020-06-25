@@ -143,7 +143,8 @@ export class CanvasComponent implements OnInit, OnChanges {
       Swal.fire({
         icon: "error",
         title: "Invalide name !",
-        text: "This name is already used"
+        text: "This name is already used",
+        heightAuto: false
       });
     }else{
       this.updateLinkName(this.dragableOldName,$event.name);
@@ -186,7 +187,8 @@ export class CanvasComponent implements OnInit, OnChanges {
       title: `Delete "${$event.name}" ?`,
       showCancelButton: true,
       confirmButtonText: "Yes",
-      cancelButtonText: "No"
+      cancelButtonText: "No",
+      heightAuto: false
     }).then( (value)=>{
       if(value.value){
         if(existingEntityIndex != -1){
@@ -217,7 +219,8 @@ export class CanvasComponent implements OnInit, OnChanges {
         title: `Delete the link between "${parent.name}" and "${lien.entityName}" ?`,
         showCancelButton: true,
         confirmButtonText: "Yes",
-        cancelButtonText: "No"
+        cancelButtonText: "No",
+        heightAuto: false
       }).then( (value)=>{
         if(value.value){
           parent.links.splice(index,1)

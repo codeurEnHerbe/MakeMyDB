@@ -30,7 +30,8 @@ export class DragableEditionComponent implements OnInit {
       ok=false;
       Swal.fire({
         icon: "error",
-        title: "A name must be defined !"
+        title: "A name must be defined !",
+        heightAuto: false
       })
     }
 
@@ -38,7 +39,8 @@ export class DragableEditionComponent implements OnInit {
       ok=false;
       Swal.fire({
         icon: "error",
-        title: "Name invalide !"
+        title: "Name invalide !",
+        heightAuto: false
       });
     }
 
@@ -47,7 +49,8 @@ export class DragableEditionComponent implements OnInit {
         ok=false;
         Swal.fire({
           icon: "error",
-          text: "An attribute has no name!"
+          text: "An attribute has no name!",
+          heightAuto: false
         });
       }
       if( (attribute.type == Type.varchar)
@@ -55,7 +58,8 @@ export class DragableEditionComponent implements OnInit {
         ok=false;
         Swal.fire({
           icon: "error",
-          html: "The attribute <b>\""+attribute.name+"\"</b> does not have the correct value for its number"
+          html: "The attribute <b>\""+attribute.name+"\"</b> does not have the correct value for its number",
+          heightAuto: false
         });
         return;
       }
@@ -64,7 +68,8 @@ export class DragableEditionComponent implements OnInit {
         ok=false;
         Swal.fire({
           icon: "error",
-          html: "The attribute <b>\""+attribute.name+"\"</b> does not have a valide name"
+          html: "The attribute <b>\""+attribute.name+"\"</b> does not have a valide name",
+          heightAuto: false
         });
         return;
       }
@@ -74,7 +79,8 @@ export class DragableEditionComponent implements OnInit {
         ok=false;
         Swal.fire({
           icon: "error",
-          html: "Several attributes have the same name"
+          html: "Several attributes have the same name",
+          heightAuto: false
         });
         return;
       }

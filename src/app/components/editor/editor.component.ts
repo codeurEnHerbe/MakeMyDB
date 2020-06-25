@@ -7,6 +7,7 @@ import { switchMap } from 'rxjs/operators';
 import { Relation } from 'src/app/interfaces/relation.interface';
 import { Entity } from 'src/app/interfaces/entity.interface';
 import Swal from 'sweetalert2';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -17,7 +18,7 @@ export class EditorComponent implements OnInit {
 
   mouseStat = MouseAction.GRAB;
   storedGraph: SchemaDataDTO;
-  currentSchema: SchemaDTO = {id: -1, name: "New MCD", schemaData: {entities: [], relations: []} };
+  currentSchema: SchemaDTO = { id: -1, name: "New MCD", schemaData: { entities: [], relations: [] } };
   currentUserSchemas: Array<SchemaDTOResponseLight>;
   sqlData: string;
   selectedListSchema: SchemaDTOResponseLight;
@@ -41,10 +42,10 @@ export class EditorComponent implements OnInit {
     this.loadAllSchemas();
   }
 
-  canvasUpdate($event: SchemaDataDTO){
-    if($event.entities){
+  canvasUpdate($event: SchemaDataDTO) {
+    if ($event.entities) {
       this.currentSchema.schemaData = $event;
-      localStorage.setItem("savedGraph",JSON.stringify($event));
+      localStorage.setItem("savedGraph", JSON.stringify($event));
     }
   }
 
@@ -63,22 +64,23 @@ export class EditorComponent implements OnInit {
   }
 
   public generateSql() {
-    if(this.verifySchema(this.currentSchema)){
+    if (this.verifySchema(this.currentSchema)) {
       this.showSchemaList = false;
-      if(!this.currentSchema.id){
+      if (!this.currentSchema.id) {
         Swal.fire({
           icon: "error",
           title: "Uknown schema",
-          html: "Please save your schema"
+          html: "Please save your schema",
+          heightAuto: false
         });
       }
       console.log("generating sql...")
       this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
         this.sqlData = res.body;
         console.log(res)
-      },error => {
-          if (error.status == 400) {
-          }
+      }, error => {
+        if (error.status == 400) {
+        }
       });
     }
   }
@@ -96,7 +98,6 @@ export class EditorComponent implements OnInit {
 
   public loadSchema() {
     this.schemaService.loadSchema(this.selectedListSchema.id).subscribe(res => {
-      console.log("res",res)
       this.currentSchema = {
         id: res.id,
         name: res.name,
@@ -106,50 +107,72 @@ export class EditorComponent implements OnInit {
     });
   }
 
-  private verifySchema(shema: SchemaDTO): boolean{
+  public deleteSchema() {
+    Swal.fire({
+      icon: "warning",
+      title: "Delete Schema",
+      html: "Are you sure you want to delete this schema ?",
+      showCancelButton: true,
+      confirmButtonText: "YES",
+      cancelButtonText: "NO",
+      heightAuto: false
+    }).then(value => {
+      console.log(value)
+      if (value.isConfirmed) {
+        this.schemaService.deleteSchema().subscribe();
+      }
+    }
+    );
+
+  }
+
+  private verifySchema(shema: SchemaDTO): boolean {
     let entitiesDragable = shema.schemaData.entities;
     let relationsDragable = shema.schemaData.relations;
     let entitiesValide = true;
     let relationsValide = true;
 
-    entitiesDragable.forEach( entitieDragable => {
+    entitiesDragable.forEach(entitieDragable => {
       let havePrimaryKey = false;
       let allAttributesValide = true;
       const entity: Entity = entitieDragable.element;
-      if(entity.attributes.length < 1){
+      if (entity.attributes.length < 1) {
         allAttributesValide = false;
         Swal.fire({
           icon: "error",
           title: "Incorrect schema",
-          html: "The entity <b>\""+entity.name+"\"</b> does not have any attributes."
+          html: "The entity <b>\"" + entity.name + "\"</b> does not have any attributes.",
+          heightAuto: false
         });
         return;
       }
-      entity.attributes.forEach( attribute =>{
-        if(attribute.isPrimary) havePrimaryKey=true;
+      entity.attributes.forEach(attribute => {
+        if (attribute.isPrimary) havePrimaryKey = true;
       });
 
-      if(!havePrimaryKey){
+      if (!havePrimaryKey) {
         Swal.fire({
           icon: "error",
           title: "Incorrect schema",
-          html: "The entity <b>\""+entity.name+"\"</b> does not have any primary key"
+          html: "The entity <b>\"" + entity.name + "\"</b> does not have any primary key",
+          heightAuto: false
         });
         return;
       }
-      
+
     });
 
-    if(entitiesValide){
-      relationsDragable.forEach( relationDragable => {
+    if (entitiesValide) {
+      relationsDragable.forEach(relationDragable => {
 
         const relation: Relation = relationDragable.element;
-        if(relation.links.length < 2){
-          relationsValide=false;
+        if (relation.links.length < 2) {
+          relationsValide = false;
           Swal.fire({
             icon: "error",
             title: "Incorrect schema",
-            html: "The relation \""+relation.name+"\" doesn't link enough entities"
+            html: "The relation \"" + relation.name + "\" doesn't link enough entities",
+            heightAuto: false
           });
           return;
         }
