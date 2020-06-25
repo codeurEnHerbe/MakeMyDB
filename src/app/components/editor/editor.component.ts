@@ -118,7 +118,8 @@ export class EditorComponent implements OnInit {
     }).then(value => {
       console.log(value)
       if (value.isConfirmed) {
-        this.schemaService.deleteSchema().subscribe();
+        this.schemaService.deleteSchema(this.selectedListSchema.id).subscribe();
+        this.loadAllSchemas();
       }
     }
     );
