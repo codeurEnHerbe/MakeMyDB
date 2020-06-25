@@ -33,6 +33,6 @@ export class SchemaRestService {
   }
 
   deleteSchema(id: number): Observable<any> {
-    return this.http.get(`/api/schema/delete/` + id);
+    return this.http.post(`/api/schema/delete/` + id, null);
   }
 }

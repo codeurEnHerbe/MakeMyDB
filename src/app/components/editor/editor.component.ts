@@ -73,11 +73,12 @@ export class EditorComponent implements OnInit {
           heightAuto: false
         });
       }
-      console.log("generating sql...")
+      console.log("Generating sql...")
       this.schemaService.generateSql(this.currentSchema.id).subscribe(res => {
         this.sqlData = res.body;
-        console.log(res)
+        console.log("Done");
       }, error => {
+        console.error("Failed to generate sql :", error);
         if (error.status == 400) {
         }
       });
@@ -116,10 +117,10 @@ export class EditorComponent implements OnInit {
       cancelButtonText: "NO",
       heightAuto: false
     }).then(value => {
-      console.log(value)
       if (value.isConfirmed) {
-        this.schemaService.deleteSchema(this.selectedListSchema.id).subscribe();
-        this.loadAllSchemas();
+        this.schemaService.deleteSchema(this.selectedListSchema.id).subscribe( ()=>{
+          this.loadAllSchemas();
+        });
       }
     }
     );

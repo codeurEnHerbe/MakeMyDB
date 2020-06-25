@@ -14,7 +14,6 @@ export class RegisterForm extends FormGroup {
     }
 
     private validateUserNameNotTaken(control: AbstractControl) {
-        console.log(this.confirmPassword.errors)
         if (control.value.length) {
             return this.userService.checkUserName(control.value).pipe(
                 map(
