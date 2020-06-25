@@ -1,40 +1,46 @@
-<form [formGroup]="registerForm" (ngSubmit)="register()">
-  <fieldset>
-    <div id="legend">
-      <legend class="">Register</legend>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Email</label>
-      <div class="controls">
-        <input type="text" formControlName="email" placeholder="" class="input-xlarge">
-        <p *ngIf="registerForm.email.hasError('email')" style="color: red">Verify email syntax</p>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Username</label>
-      <div class="controls">
-        <input type="text" formControlName="userName" placeholder="" class="input-xlarge">
-        <p *ngIf="registerForm.userName.hasError('usernameTaken')" style="color: red">This username is already taken</p>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Password</label>
-      <div class="controls">
-        <input type="password" formControlName="password" placeholder="" class="input-xlarge">
-        <p *ngIf="registerForm.password.hasError('minlength')" style="color: red">You're password has to be atleast 6 characters long</p>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Password Confirm</label>
-      <div class="controls">
-        <input type="password" formControlName="confirmPassword" placeholder="" class="input-xlarge">
-        <p *ngIf="registerForm.confirmPassword.hasError('notSame')" style="color: red">Passwords does not matches</p>
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="controls">
-        <button [ngClass]="{'disabled-button': registerForm.invalid}" [disabled]="registerForm.invalid" class="btn btn-success" type="submit">Register</button>
-      </div>
-    </div>
-  </fieldset>
-</form>
+<div class="wrapper">
+  <div id="formContent">
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <fieldset>
+        <div id="legend">
+          <legend class="">Register</legend>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Email</label>
+          <div class="controls">
+            <input type="text" formControlName="email" placeholder="" class="input-xlarge">
+            <p *ngIf="registerForm.email.hasError('email')" style="color: red">Verify email syntax</p>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Username</label>
+          <div class="controls">
+            <input type="text" formControlName="userName" placeholder="" class="input-xlarge">
+            <p *ngIf="registerForm.userName.hasError('usernameTaken')" style="color: red">This username is already taken</p>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Password</label>
+          <div class="controls">
+            <input type="password" formControlName="password" placeholder="" class="input-xlarge">
+            <p *ngIf="registerForm.password.hasError('minlength')" style="color: red">You're password has to be atleast 6 characters long</p>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Password Confirm</label>
+          <div class="controls">
+            <input type="password" formControlName="confirmPassword" placeholder="" class="input-xlarge">
+            <p *ngIf="registerForm.confirmPassword.hasError('notSame')" style="color: red">Passwords does not matches</p>
+          </div>
+        </div>
+        <br>
+        <div class="control-group">
+          <div class="controls">
+            <button [ngClass]="{'disabled-button': registerForm.invalid}" [disabled]="registerForm.invalid" class="btn btn-success" type="submit">Register</button>
+          </div>
+        </div>
+        <br>
+      </fieldset>
+    </form>
+  </div>
+</div>

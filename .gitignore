@@ -46,5 +46,5 @@ testem.log
 Thumbs.db
 
 #conf conflict
-/proxy.conf.json
-/src/app/utils/backend/http-interceptor.ts
+proxy.conf.json
+src/app/utils/backend/http-interceptor.ts

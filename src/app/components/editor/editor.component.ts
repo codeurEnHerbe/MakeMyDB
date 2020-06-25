@@ -1,13 +1,12 @@
 import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { MouseAction } from '../tool-box/tool-box.component';
 
-import { SchemaDataDTO, SchemaDTO, SchemaDTOResponse, SchemaDTOResponseLight } from '../../interfaces/schema-data.interface';
+import { SchemaDataDTO, SchemaDTO, SchemaDTOResponseLight } from '../../interfaces/schema-data.interface';
 import { SchemaRestService } from 'src/app/services/schema-rest.service';
 import { switchMap } from 'rxjs/operators';
 import { Relation } from 'src/app/interfaces/relation.interface';
 import { Entity } from 'src/app/interfaces/entity.interface';
 import Swal from 'sweetalert2';
-import { of } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
